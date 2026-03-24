@@ -20,10 +20,21 @@ function authenticate(req, res, next) {
   }
 }
 
+function normalizePermission(permission) {
+  return String(permission || '')
+    .trim()
+    .replace(/\./g, '_')
+    .replace(/-/g, '_')
+    .toUpperCase();
+}
+
 function authorize(requiredPermissions = []) {
   return (req, res, next) => {
     const permissions = req.user?.permissions || [];
-    const hasPermission = requiredPermissions.every((permission) => permissions.includes(permission));
+    const normalizedPermissions = permissions.map(normalizePermission);
+    const hasPermission = requiredPermissions.every((permission) => {
+      return permissions.includes(permission) || normalizedPermissions.includes(normalizePermission(permission));
+    });
 
     if (!hasPermission) {
       return next(new AppError('Bạn không có quyền thực hiện chức năng này', 403));

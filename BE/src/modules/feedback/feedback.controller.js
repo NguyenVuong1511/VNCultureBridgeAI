@@ -1,10 +1,11 @@
 const feedbackService = require('./feedback.service');
 const { successResponse } = require('../../utils/apiResponse');
+const { getRequestSessionId } = require('../../utils/request');
 
 async function createFeedback(req, res, next) {
   try {
     const data = await feedbackService.createFeedback({
-      sessionId: req.headers['x-session-id'] || null,
+      sessionId: getRequestSessionId(req),
       type: req.body.type,
       articleId: req.body.articleId ? Number(req.body.articleId) : null,
       messageId: req.body.messageId ? Number(req.body.messageId) : null,

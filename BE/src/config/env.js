@@ -2,6 +2,9 @@ const dotenv = require('dotenv');
 
 dotenv.config();
 
+const dbInstance = process.env.DB_INSTANCE || '';
+const dbPort = process.env.DB_PORT ? Number(process.env.DB_PORT) : null;
+
 const env = {
   port: Number(process.env.PORT) || 3000,
   nodeEnv: process.env.NODE_ENV || 'development',
@@ -12,10 +15,11 @@ const env = {
     password: process.env.DB_PASSWORD || '',
     server: process.env.DB_SERVER || 'localhost',
     database: process.env.DB_NAME || '',
-    port: Number(process.env.DB_PORT) || 1433,
+    ...(dbInstance ? {} : { port: dbPort || 1433 }),
     options: {
       encrypt: process.env.DB_ENCRYPT === 'true',
-      trustServerCertificate: process.env.DB_TRUST_SERVER_CERTIFICATE !== 'false'
+      trustServerCertificate: process.env.DB_TRUST_SERVER_CERTIFICATE !== 'false',
+      ...(dbInstance ? { instanceName: dbInstance } : {})
     }
   }
 };

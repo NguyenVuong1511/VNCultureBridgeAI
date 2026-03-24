@@ -103,6 +103,24 @@ async function publish(req, res, next) {
   }
 }
 
+async function hide(req, res, next) {
+  try {
+    const data = await adminArticlesService.changeStatus(Number(req.params.id), 'AN', req.user.id, 'Ẩn bài viết');
+    res.json(successResponse({ message: 'Ẩn bài viết thành công', data }));
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function archive(req, res, next) {
+  try {
+    const data = await adminArticlesService.changeStatus(Number(req.params.id), 'LUU_TRU', req.user.id, 'Lưu trữ bài viết');
+    res.json(successResponse({ message: 'Lưu trữ bài viết thành công', data }));
+  } catch (error) {
+    next(error);
+  }
+}
+
 async function getTranslations(req, res, next) {
   try {
     const data = await adminArticlesService.getTranslations(Number(req.params.id));
@@ -218,6 +236,33 @@ async function replaceMedia(req, res, next) {
   }
 }
 
+async function getStatusHistory(req, res, next) {
+  try {
+    const data = await adminArticlesService.getStatusHistory(Number(req.params.id));
+    res.json(successResponse({ message: 'Lấy lịch sử trạng thái bài viết thành công', data }));
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function getVersions(req, res, next) {
+  try {
+    const data = await adminArticlesService.getVersions(Number(req.params.id));
+    res.json(successResponse({ message: 'Lấy danh sách phiên bản bài viết thành công', data }));
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function getVersionById(req, res, next) {
+  try {
+    const data = await adminArticlesService.getVersionById(Number(req.params.id), Number(req.params.versionId));
+    res.json(successResponse({ message: 'Lấy chi tiết phiên bản bài viết thành công', data }));
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   getAdminArticles,
   getAdminArticleById,
@@ -227,6 +272,8 @@ module.exports = {
   approve,
   reject,
   publish,
+  hide,
+  archive,
   getTranslations,
   upsertTranslation,
   replaceCategories,
@@ -237,5 +284,8 @@ module.exports = {
   replaceTags,
   replaceKeywords,
   replaceRelatedArticles,
-  replaceMedia
+  replaceMedia,
+  getStatusHistory,
+  getVersions,
+  getVersionById
 };

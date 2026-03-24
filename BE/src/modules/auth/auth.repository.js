@@ -58,9 +58,37 @@ async function updateLastLogin(userId) {
   await query(sql, { userId });
 }
 
+async function updatePassword(userId, passwordHash) {
+  await query(`
+    UPDATE QUAN_TRI_NGUOI_DUNG
+    SET MatKhauHash = @passwordHash,
+        NgayCapNhat = SYSUTCDATETIME()
+    WHERE IDNguoiDung = @userId
+  `, { userId, passwordHash });
+}
+
+async function findUserById(userId) {
+  const rows = await query(`
+    SELECT TOP 1
+      u.IDNguoiDung AS id,
+      u.TenDangNhap AS username,
+      u.Email AS email,
+      u.MatKhauHash AS passwordHash,
+      u.HoTen AS fullName,
+      u.TrangThai AS status,
+      u.LanDangNhapCuoi AS lastLoginAt
+    FROM QUAN_TRI_NGUOI_DUNG u
+    WHERE u.IDNguoiDung = @userId
+  `, { userId });
+
+  return rows[0] || null;
+}
+
 module.exports = {
   findUserByUsername,
+  findUserById,
   findRolesByUserId,
   findPermissionsByUserId,
-  updateLastLogin
+  updateLastLogin,
+  updatePassword
 };

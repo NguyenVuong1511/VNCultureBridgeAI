@@ -43,10 +43,87 @@ async function createKeyword(payload) { ensureCode(payload); const created = awa
 async function updateKeyword(id, payload) { await getKeywordById(id); ensureCode(payload); await repository.updateKeyword(id, payload); return getKeywordById(id); }
 async function deleteKeyword(id) { await getKeywordById(id); await repository.deleteKeyword(id); return { id }; }
 
+const TRANSLATION_CONFIG = {
+  categories: {
+    loader: getCategoryById,
+    tableName: 'DANH_MUC_CHU_DE_BAN_DICH',
+    idColumn: 'IDDanhMuc',
+    nameColumn: 'TenDanhMuc',
+    descriptionColumn: 'MoTa',
+    notFoundMessage: 'Không tìm thấy danh mục'
+  },
+  regions: {
+    loader: getRegionById,
+    tableName: 'VUNG_VAN_HOA_BAN_DICH',
+    idColumn: 'IDVung',
+    nameColumn: 'TenVung',
+    descriptionColumn: 'MoTa',
+    notFoundMessage: 'Không tìm thấy vùng văn hoá'
+  },
+  ethnicGroups: {
+    loader: getEthnicGroupById,
+    tableName: 'DAN_TOC_BAN_DICH',
+    idColumn: 'IDDanToc',
+    nameColumn: 'TenDanToc',
+    descriptionColumn: 'MoTa',
+    notFoundMessage: 'Không tìm thấy dân tộc'
+  },
+  tags: {
+    loader: getTagById,
+    tableName: 'THE_NOI_DUNG_BAN_DICH',
+    idColumn: 'IDThe',
+    nameColumn: 'TenThe',
+    descriptionColumn: 'MoTa',
+    notFoundMessage: 'Không tìm thấy tag'
+  },
+  keywords: {
+    loader: getKeywordById,
+    tableName: 'TU_KHOA_BAN_DICH',
+    idColumn: 'IDTuKhoa',
+    nameColumn: 'TuKhoaHienThi',
+    descriptionColumn: null,
+    notFoundMessage: 'Không tìm thấy từ khoá'
+  }
+};
+
+function getTranslationConfig(entityType) {
+  const config = TRANSLATION_CONFIG[entityType];
+  if (!config) throw new AppError('Loại thực thể translation không hợp lệ', 400);
+  return config;
+}
+
+function normalizeTranslationPayload(payload, config) {
+  if (!payload.name) throw new AppError('name là bắt buộc', 400);
+  return {
+    name: payload.name,
+    ...(config.descriptionColumn ? { description: payload.description || null } : {})
+  };
+}
+
+async function listEntityTranslations(entityType, id) {
+  const config = getTranslationConfig(entityType);
+  await getEntityOrThrow(config.loader, id, config.notFoundMessage);
+  return repository.listTranslations({ ...config, id });
+}
+
+async function upsertEntityTranslation(entityType, id, language, payload) {
+  const config = getTranslationConfig(entityType);
+  if (!language) throw new AppError('language là bắt buộc', 400);
+  await getEntityOrThrow(config.loader, id, config.notFoundMessage);
+  await repository.upsertTranslation({
+    ...config,
+    id,
+    language,
+    payload: normalizeTranslationPayload(payload, config)
+  });
+  return repository.listTranslations({ ...config, id });
+}
+
 module.exports = {
   listCategories, getCategoryById, createCategory, updateCategory, deleteCategory,
   listRegions, getRegionById, createRegion, updateRegion, deleteRegion,
   listEthnicGroups, getEthnicGroupById, createEthnicGroup, updateEthnicGroup, deleteEthnicGroup,
   listTags, getTagById, createTag, updateTag, deleteTag,
-  listKeywords, getKeywordById, createKeyword, updateKeyword, deleteKeyword
+  listKeywords, getKeywordById, createKeyword, updateKeyword, deleteKeyword,
+  listEntityTranslations, upsertEntityTranslation
 };

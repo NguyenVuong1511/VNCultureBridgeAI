@@ -23,7 +23,20 @@ async function getMe(req, res, next) {
   }
 }
 
+async function changePassword(req, res, next) {
+  try {
+    const data = await authService.changePassword(req.user.id, {
+      currentPassword: req.body.currentPassword,
+      newPassword: req.body.newPassword
+    });
+    res.json(successResponse({ message: 'Đổi mật khẩu thành công', data }));
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
   login,
-  getMe
+  getMe,
+  changePassword
 };

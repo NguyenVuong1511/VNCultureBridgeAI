@@ -104,7 +104,9 @@ async function changeStatus(articleId, nextStatus, userId, note = null, rejectio
     CHO_DUYET: ['NHAP', 'TU_CHOI'],
     DA_DUYET: ['CHO_DUYET'],
     TU_CHOI: ['CHO_DUYET'],
-    DA_XUAT_BAN: ['DA_DUYET']
+    DA_XUAT_BAN: ['DA_DUYET'],
+    AN: ['DA_XUAT_BAN'],
+    LUU_TRU: ['DA_XUAT_BAN', 'AN']
   };
 
   if (!transitions[nextStatus]?.includes(article.status)) {
@@ -178,9 +180,15 @@ async function replaceCategories(articleId, categories) {
 
   await adminArticlesRepository.clearArticleCategories(articleId);
   for (const category of categories) {
-    await adminArticlesRepository.addArticleCategory(articleId, Number(category.id), Boolean(category.isPrimary));
+    const categoryId = Number(category.id);
+    const existingCategory = await adminArticlesRepository.findCategoryById(categoryId);
+    if (!existingCategory) {
+      throw new AppError(`Danh mục không tồn tại: ${categoryId}`, 404);
+    }
+    await adminArticlesRepository.addArticleCategory(articleId, categoryId, Boolean(category.isPrimary));
   }
 
+  await adminArticlesRepository.updatePublishedSyncFlag(articleId);
   return adminArticlesRepository.findCategories(articleId);
 }
 
@@ -197,13 +205,19 @@ async function replaceRegions(articleId, regions) {
 
   await adminArticlesRepository.clearArticleRegions(articleId);
   for (const region of regions) {
+    const regionId = Number(region.id);
+    const existingRegion = await adminArticlesRepository.findRegionById(regionId);
+    if (!existingRegion) {
+      throw new AppError(`Vùng văn hoá không tồn tại: ${regionId}`, 404);
+    }
     const relationType = region.relationType || 'LIEN_QUAN';
     if (!['NGUON_GOC', 'THUC_HANH', 'PHO_BIEN', 'LIEN_QUAN'].includes(relationType)) {
       throw new AppError('Loại liên hệ vùng không hợp lệ', 400);
     }
-    await adminArticlesRepository.addArticleRegion(articleId, Number(region.id), relationType);
+    await adminArticlesRepository.addArticleRegion(articleId, regionId, relationType);
   }
 
+  await adminArticlesRepository.updatePublishedSyncFlag(articleId);
   return adminArticlesRepository.findRegions(articleId);
 }
 
@@ -220,13 +234,19 @@ async function replaceEthnicGroups(articleId, ethnicGroups) {
 
   await adminArticlesRepository.clearArticleEthnicGroups(articleId);
   for (const ethnicGroup of ethnicGroups) {
+    const ethnicGroupId = Number(ethnicGroup.id);
+    const existingEthnicGroup = await adminArticlesRepository.findEthnicGroupById(ethnicGroupId);
+    if (!existingEthnicGroup) {
+      throw new AppError(`Dân tộc không tồn tại: ${ethnicGroupId}`, 404);
+    }
     const relationType = ethnicGroup.relationType || 'LIEN_QUAN';
     if (!['NGUON_GOC', 'THUC_HANH', 'LIEN_QUAN'].includes(relationType)) {
       throw new AppError('Loại liên hệ dân tộc không hợp lệ', 400);
     }
-    await adminArticlesRepository.addArticleEthnicGroup(articleId, Number(ethnicGroup.id), relationType);
+    await adminArticlesRepository.addArticleEthnicGroup(articleId, ethnicGroupId, relationType);
   }
 
+  await adminArticlesRepository.updatePublishedSyncFlag(articleId);
   return adminArticlesRepository.findEthnicGroups(articleId);
 }
 
@@ -264,6 +284,7 @@ async function createReference(articleId, payload) {
     Boolean(payload.isPrimary)
   );
 
+  await adminArticlesRepository.updatePublishedSyncFlag(articleId);
   return adminArticlesRepository.findReferences(articleId);
 }
 
@@ -278,15 +299,22 @@ async function attachReference(articleId, payload) {
     throw new AppError('referenceId là bắt buộc', 400);
   }
 
+  const referenceId = Number(payload.referenceId);
+  const reference = await adminArticlesRepository.findReferenceById(referenceId);
+  if (!reference) {
+    throw new AppError(`Nguồn tham khảo không tồn tại: ${referenceId}`, 404);
+  }
+
   await adminArticlesRepository.attachReferenceToArticle(
     articleId,
-    Number(payload.referenceId),
+    referenceId,
     payload.citationNote || null,
     payload.pageFrom || null,
     payload.pageTo || null,
     Boolean(payload.isPrimary)
   );
 
+  await adminArticlesRepository.updatePublishedSyncFlag(articleId);
   return adminArticlesRepository.findReferences(articleId);
 }
 
@@ -380,6 +408,38 @@ async function replaceMedia(articleId, mediaItems) {
   return adminArticlesRepository.findMedia(articleId);
 }
 
+async function getStatusHistory(articleId) {
+  const article = await adminArticlesRepository.findById(articleId);
+  if (!article) {
+    throw new AppError('Không tìm thấy bài viết', 404);
+  }
+
+  return adminArticlesRepository.findStatusHistory(articleId);
+}
+
+async function getVersions(articleId) {
+  const article = await adminArticlesRepository.findById(articleId);
+  if (!article) {
+    throw new AppError('Không tìm thấy bài viết', 404);
+  }
+
+  return adminArticlesRepository.findVersions(articleId);
+}
+
+async function getVersionById(articleId, versionId) {
+  const article = await adminArticlesRepository.findById(articleId);
+  if (!article) {
+    throw new AppError('Không tìm thấy bài viết', 404);
+  }
+
+  const version = await adminArticlesRepository.findVersionById(articleId, versionId);
+  if (!version) {
+    throw new AppError('Không tìm thấy phiên bản bài viết', 404);
+  }
+
+  return version;
+}
+
 module.exports = {
   getAdminArticles,
   getAdminArticleById,
@@ -396,5 +456,8 @@ module.exports = {
   replaceTags,
   replaceKeywords,
   replaceRelatedArticles,
-  replaceMedia
+  replaceMedia,
+  getStatusHistory,
+  getVersions,
+  getVersionById
 };

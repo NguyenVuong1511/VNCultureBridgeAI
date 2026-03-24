@@ -1,3 +1,5 @@
+const { AppError } = require('./appError');
+
 function getRequestLanguage(req) {
   const lang = req.query.lang || req.headers['accept-language'];
 
@@ -20,7 +22,23 @@ function getPagination(req) {
   return { page, pageSize, offset };
 }
 
+function getRequestSessionId(req) {
+  return req.headers['x-session-id'] || req.body?.sessionId || req.query?.sessionId || null;
+}
+
+function getRequiredPositiveInt(value, fieldName) {
+  const parsed = Number(value);
+
+  if (!Number.isInteger(parsed) || parsed <= 0) {
+    throw new AppError(`${fieldName} không hợp lệ`, 400);
+  }
+
+  return parsed;
+}
+
 module.exports = {
   getRequestLanguage,
-  getPagination
+  getPagination,
+  getRequestSessionId,
+  getRequiredPositiveInt
 };

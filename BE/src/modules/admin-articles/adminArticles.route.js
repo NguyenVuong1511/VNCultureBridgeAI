@@ -8,6 +8,9 @@ router.use(authenticate);
 
 router.get('/', authorize(['article.read']), controller.getAdminArticles);
 router.get('/:id', authorize(['article.read']), controller.getAdminArticleById);
+router.get('/:id/status-history', authorize(['article.read']), controller.getStatusHistory);
+router.get('/:id/versions', authorize(['article.read']), controller.getVersions);
+router.get('/:id/versions/:versionId', authorize(['article.read']), controller.getVersionById);
 router.post('/', authorize(['article.create']), controller.createAdminArticle);
 router.put('/:id', authorize(['article.update']), controller.updateAdminArticle);
 router.get('/:id/translations', authorize(['article.read']), controller.getTranslations);
@@ -25,5 +28,7 @@ router.post('/:id/submit-review', authorize(['article.submit_review']), controll
 router.post('/:id/approve', authorize(['article.approve']), controller.approve);
 router.post('/:id/reject', authorize(['article.approve']), controller.reject);
 router.post('/:id/publish', authorize(['article.publish']), controller.publish);
+router.post('/:id/hide', authorize(['article.publish']), controller.hide);
+router.post('/:id/archive', authorize(['article.publish']), controller.archive);
 
 module.exports = router;

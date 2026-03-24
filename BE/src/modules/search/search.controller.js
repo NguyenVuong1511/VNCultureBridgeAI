@@ -1,6 +1,6 @@
 const searchService = require('./search.service');
 const { successResponse } = require('../../utils/apiResponse');
-const { getPagination, getRequestLanguage } = require('../../utils/request');
+const { getPagination, getRequestLanguage, getRequestSessionId } = require('../../utils/request');
 
 async function search(req, res, next) {
   try {
@@ -17,7 +17,7 @@ async function search(req, res, next) {
       categoryId: req.query.categoryId ? Number(req.query.categoryId) : null,
       regionId: req.query.regionId ? Number(req.query.regionId) : null,
       ethnicId: req.query.ethnicId ? Number(req.query.ethnicId) : null,
-      sessionId: req.headers['x-session-id'] || null
+      sessionId: getRequestSessionId(req)
     });
 
     res.json(successResponse({

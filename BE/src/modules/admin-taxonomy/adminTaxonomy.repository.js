@@ -150,6 +150,45 @@ async function deleteKeyword(id) {
   await query('DELETE FROM TU_KHOA WHERE IDTuKhoa = @id', { id });
 }
 
+async function listTranslations({ tableName, idColumn, nameColumn, descriptionColumn = null, id }) {
+  const descriptionSelect = descriptionColumn ? `${descriptionColumn} AS description` : `CAST(NULL AS NVARCHAR(1000)) AS description`;
+  return query(`
+    SELECT
+      ${idColumn} AS entityId,
+      MaNgonNgu AS language,
+      ${nameColumn} AS name,
+      ${descriptionSelect}
+    FROM ${tableName}
+    WHERE ${idColumn} = @id
+    ORDER BY MaNgonNgu ASC
+  `, { id });
+}
+
+async function upsertTranslation({ tableName, idColumn, nameColumn, descriptionColumn = null, id, language, payload }) {
+  const updateDescription = descriptionColumn ? `, ${descriptionColumn} = @description` : '';
+  const insertDescriptionColumns = descriptionColumn ? `, ${descriptionColumn}` : '';
+  const insertDescriptionValues = descriptionColumn ? `, @description` : '';
+
+  await query(`
+    IF EXISTS (SELECT 1 FROM ${tableName} WHERE ${idColumn} = @id AND MaNgonNgu = @language)
+    BEGIN
+      UPDATE ${tableName}
+      SET ${nameColumn} = @name${updateDescription}
+      WHERE ${idColumn} = @id AND MaNgonNgu = @language
+    END
+    ELSE
+    BEGIN
+      INSERT INTO ${tableName} (${idColumn}, MaNgonNgu, ${nameColumn}${insertDescriptionColumns})
+      VALUES (@id, @language, @name${insertDescriptionValues})
+    END
+  `, {
+    id,
+    language,
+    name: payload.name,
+    description: payload.description || null
+  });
+}
+
 module.exports = {
   listCategories,
   getCategoryById,
@@ -175,5 +214,7 @@ module.exports = {
   getKeywordById,
   createKeyword,
   updateKeyword,
-  deleteKeyword
+  deleteKeyword,
+  listTranslations,
+  upsertTranslation
 };

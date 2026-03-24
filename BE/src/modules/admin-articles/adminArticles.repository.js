@@ -139,6 +139,10 @@ async function updateStatus(id, { status, userId, rejectionReason = null }) {
         IDNguoiDuyet = CASE WHEN @status = 'DA_DUYET' THEN @userId ELSE IDNguoiDuyet END,
         NgayXuatBan = CASE WHEN @status = 'DA_XUAT_BAN' THEN SYSUTCDATETIME() ELSE NgayXuatBan END,
         IDNguoiXuatBan = CASE WHEN @status = 'DA_XUAT_BAN' THEN @userId ELSE IDNguoiXuatBan END,
+        NgayAn = CASE WHEN @status = 'AN' THEN SYSUTCDATETIME() ELSE NgayAn END,
+        IDNguoiAn = CASE WHEN @status = 'AN' THEN @userId ELSE IDNguoiAn END,
+        NgayLuuTru = CASE WHEN @status = 'LUU_TRU' THEN SYSUTCDATETIME() ELSE NgayLuuTru END,
+        IDNguoiLuuTru = CASE WHEN @status = 'LUU_TRU' THEN @userId ELSE IDNguoiLuuTru END,
         IDNguoiCapNhat = @userId,
         NgayCapNhat = SYSUTCDATETIME()
     WHERE IDBaiViet = @id
@@ -409,6 +413,10 @@ async function createReference(payload) {
 }
 
 async function attachReferenceToArticle(articleId, referenceId, citationNote = null, pageFrom = null, pageTo = null, isPrimary = false) {
+  if (isPrimary) {
+    await clearPrimaryReferences(articleId);
+  }
+
   const sql = `
     IF NOT EXISTS (
       SELECT 1 FROM BAI_VIET_NGUON_THAM_KHAO WHERE IDBaiViet = @articleId AND IDNguon = @referenceId
@@ -430,6 +438,15 @@ async function attachReferenceToArticle(articleId, referenceId, citationNote = n
         @pageTo,
         @isPrimary
       )
+    END
+    ELSE
+    BEGIN
+      UPDATE BAI_VIET_NGUON_THAM_KHAO
+      SET GhiChuTrichDan = @citationNote,
+          TrangTu = @pageFrom,
+          TrangDen = @pageTo,
+          LaNguonChinh = @isPrimary
+      WHERE IDBaiViet = @articleId AND IDNguon = @referenceId
     END
   `;
 
@@ -503,6 +520,10 @@ async function clearArticleMedia(articleId) {
 }
 
 async function addArticleMedia(articleId, mediaId, displayOrder, isPrimary, usageContext) {
+  if (isPrimary) {
+    await clearPrimaryMedia(articleId);
+  }
+
   await query(
     `INSERT INTO BAI_VIET_MEDIA (IDBaiViet, IDMedia, ThuTuHienThi, LaMediaChinh, NguCanhSuDung)
      VALUES (@articleId, @mediaId, @displayOrder, @isPrimary, @usageContext)`,
@@ -605,6 +626,68 @@ async function setPrimaryMedia(articleId, mediaId) {
   await query('UPDATE BAI_VIET_MEDIA SET LaMediaChinh = 1 WHERE IDBaiViet = @articleId AND IDMedia = @mediaId', { articleId, mediaId });
 }
 
+async function findStatusHistory(articleId) {
+  return query(`
+    SELECT
+      IDLichSu AS id,
+      IDBaiViet AS articleId,
+      TrangThaiCu AS oldStatus,
+      TrangThaiMoi AS newStatus,
+      IDNguoiThayDoi AS changedBy,
+      GhiChu AS note,
+      NgayTao AS createdAt
+    FROM LICH_SU_TRANG_THAI_BAI_VIET
+    WHERE IDBaiViet = @articleId
+    ORDER BY NgayTao DESC, IDLichSu DESC
+  `, { articleId });
+}
+
+async function findVersions(articleId) {
+  return query(`
+    SELECT
+      IDPhienBan AS id,
+      IDBaiViet AS articleId,
+      SoPhienBan AS versionNumber,
+      LoaiThayDoi AS changeType,
+      TomTatThayDoi AS changeSummary,
+      TrangThaiPhienBan AS status,
+      IDNguoiGuiDuyet AS submittedBy,
+      NgayGuiDuyet AS submittedAt,
+      IDNguoiDuyet AS approvedBy,
+      NgayDuyet AS approvedAt,
+      IDNguoiXuatBan AS publishedBy,
+      NgayXuatBan AS publishedAt,
+      NgayTao AS createdAt
+    FROM PHIEN_BAN_BAI_VIET
+    WHERE IDBaiViet = @articleId
+    ORDER BY SoPhienBan DESC, IDPhienBan DESC
+  `, { articleId });
+}
+
+async function findVersionById(articleId, versionId) {
+  const rows = await query(`
+    SELECT TOP 1
+      IDPhienBan AS id,
+      IDBaiViet AS articleId,
+      SoPhienBan AS versionNumber,
+      LoaiThayDoi AS changeType,
+      TomTatThayDoi AS changeSummary,
+      DuLieuSnapshotJson AS snapshotJson,
+      TrangThaiPhienBan AS status,
+      IDNguoiGuiDuyet AS submittedBy,
+      NgayGuiDuyet AS submittedAt,
+      IDNguoiDuyet AS approvedBy,
+      NgayDuyet AS approvedAt,
+      IDNguoiXuatBan AS publishedBy,
+      NgayXuatBan AS publishedAt,
+      NgayTao AS createdAt
+    FROM PHIEN_BAN_BAI_VIET
+    WHERE IDBaiViet = @articleId AND IDPhienBan = @versionId
+  `, { articleId, versionId });
+
+  return rows[0] || null;
+}
+
 module.exports = {
   findAll,
   countAll,
@@ -652,5 +735,8 @@ module.exports = {
   clearPrimaryReferences,
   clearPrimaryMedia,
   setPrimaryReference,
-  setPrimaryMedia
+  setPrimaryMedia,
+  findStatusHistory,
+  findVersions,
+  findVersionById
 };
