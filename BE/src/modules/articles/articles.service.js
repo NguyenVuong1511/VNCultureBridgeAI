@@ -1,9 +1,10 @@
 const articlesRepository = require('./articles.repository');
 const { AppError } = require('../../utils/appError');
 
-async function getArticles({ language, page, pageSize, offset, keyword }) {
-  const items = await articlesRepository.findAll({ language, offset, pageSize, keyword });
-  const total = await articlesRepository.countAll({ language, keyword });
+async function getArticles({ language, page, pageSize, offset, keyword, categoryId, regionId, ethnicId, featured, type }) {
+  const filters = { language, offset, pageSize, keyword, categoryId, regionId, ethnicId, featured, type };
+  const items = await articlesRepository.findAll(filters);
+  const total = await articlesRepository.countAll(filters);
 
   return {
     items,
@@ -16,12 +17,13 @@ async function getArticles({ language, page, pageSize, offset, keyword }) {
 }
 
 async function buildArticleDetail(article, language) {
-  const [categories, regions, ethnicGroups, relatedArticles, references] = await Promise.all([
+  const [categories, regions, ethnicGroups, relatedArticles, references, media] = await Promise.all([
     articlesRepository.findCategories(article.id, language),
     articlesRepository.findRegions(article.id, language),
     articlesRepository.findEthnicGroups(article.id, language),
     articlesRepository.findRelated(article.id, language),
-    articlesRepository.findReferences(article.id)
+    articlesRepository.findReferences(article.id),
+    articlesRepository.findMedia(article.id, language)
   ]);
 
   return {
@@ -30,7 +32,8 @@ async function buildArticleDetail(article, language) {
     regions,
     ethnicGroups,
     relatedArticles,
-    references
+    references,
+    media
   };
 }
 

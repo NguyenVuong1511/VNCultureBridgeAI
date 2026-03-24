@@ -1,6 +1,6 @@
 const { query } = require('../../config/db');
 
-async function findAll({ language, offset, pageSize, keyword }) {
+async function findAll({ language, offset, pageSize, keyword, categoryId, regionId, ethnicId, featured, type }) {
   const sql = `
     SELECT
       b.IDBaiViet AS id,
@@ -31,28 +31,62 @@ async function findAll({ language, offset, pageSize, keyword }) {
       ON t.IDBaiViet = b.IDBaiViet
       AND t.MaNgonNgu = @language
       AND t.TrangThaiBanDich IN ('DA_DUYET', 'DA_XUAT_BAN')
+    LEFT JOIN BAI_VIET_DANH_MUC bc ON bc.IDBaiViet = b.IDBaiViet
+    LEFT JOIN BAI_VIET_VUNG_VAN_HOA br ON br.IDBaiViet = b.IDBaiViet
+    LEFT JOIN BAI_VIET_DAN_TOC be ON be.IDBaiViet = b.IDBaiViet
     WHERE b.TrangThai = 'DA_XUAT_BAN'
       AND (@keyword = '' OR t.TieuDe LIKE '%' + @keyword + '%' OR t.TomTat LIKE '%' + @keyword + '%')
+      AND (@categoryId IS NULL OR bc.IDDanhMuc = @categoryId)
+      AND (@regionId IS NULL OR br.IDVung = @regionId)
+      AND (@ethnicId IS NULL OR be.IDDanToc = @ethnicId)
+      AND (@featured IS NULL OR b.NoiDungNoiBat = @featured)
+      AND (@type = '' OR b.LoaiBaiViet = @type)
+    GROUP BY
+      b.IDBaiViet,
+      b.DuongDanSeo,
+      b.MaNgonNguGoc,
+      b.LoaiBaiViet,
+      b.TrangThai,
+      b.CapDoNhayCam,
+      b.MucDoKiemDuyet,
+      b.NoiDungNoiBat,
+      b.NgayXuatBan,
+      t.MaNgonNgu,
+      t.TieuDe,
+      t.TomTat,
+      t.GioiThieu,
+      t.NguonGoc,
+      t.YNghiaVanHoa,
+      t.BoiCanhSuDung,
+      t.NoiDungChiTiet
     ORDER BY b.NgayXuatBan DESC, b.IDBaiViet DESC
     OFFSET @offset ROWS FETCH NEXT @pageSize ROWS ONLY
   `;
 
-  return query(sql, { language, offset, pageSize, keyword });
+  return query(sql, { language, offset, pageSize, keyword, categoryId, regionId, ethnicId, featured, type });
 }
 
-async function countAll({ language, keyword }) {
+async function countAll({ language, keyword, categoryId, regionId, ethnicId, featured, type }) {
   const sql = `
-    SELECT COUNT(1) AS total
+    SELECT COUNT(DISTINCT b.IDBaiViet) AS total
     FROM BAI_VIET b
     INNER JOIN BAI_VIET_BAN_DICH t
       ON t.IDBaiViet = b.IDBaiViet
       AND t.MaNgonNgu = @language
       AND t.TrangThaiBanDich IN ('DA_DUYET', 'DA_XUAT_BAN')
+    LEFT JOIN BAI_VIET_DANH_MUC bc ON bc.IDBaiViet = b.IDBaiViet
+    LEFT JOIN BAI_VIET_VUNG_VAN_HOA br ON br.IDBaiViet = b.IDBaiViet
+    LEFT JOIN BAI_VIET_DAN_TOC be ON be.IDBaiViet = b.IDBaiViet
     WHERE b.TrangThai = 'DA_XUAT_BAN'
       AND (@keyword = '' OR t.TieuDe LIKE '%' + @keyword + '%' OR t.TomTat LIKE '%' + @keyword + '%')
+      AND (@categoryId IS NULL OR bc.IDDanhMuc = @categoryId)
+      AND (@regionId IS NULL OR br.IDVung = @regionId)
+      AND (@ethnicId IS NULL OR be.IDDanToc = @ethnicId)
+      AND (@featured IS NULL OR b.NoiDungNoiBat = @featured)
+      AND (@type = '' OR b.LoaiBaiViet = @type)
   `;
 
-  const rows = await query(sql, { language, keyword });
+  const rows = await query(sql, { language, keyword, categoryId, regionId, ethnicId, featured, type });
   return rows[0]?.total || 0;
 }
 
@@ -223,6 +257,32 @@ async function findReferences(articleId) {
   return query(sql, { articleId });
 }
 
+async function findMedia(articleId, language) {
+  const sql = `
+    SELECT
+      m.IDMedia AS id,
+      m.LoaiMedia AS type,
+      m.DuongDanTep AS url,
+      m.VanBanThayThe AS altText,
+      m.BanQuyen AS copyright,
+      bm.LaMediaChinh AS isPrimary,
+      bm.ThuTuHienThi AS displayOrder,
+      t.TieuDeMedia AS title,
+      t.MoTaMedia AS description
+    FROM BAI_VIET_MEDIA bm
+    INNER JOIN MEDIA m
+      ON m.IDMedia = bm.IDMedia
+      AND m.TrangThai = 'HOAT_DONG'
+    LEFT JOIN MEDIA_BAN_DICH t
+      ON t.IDMedia = m.IDMedia
+      AND t.MaNgonNgu = @language
+    WHERE bm.IDBaiViet = @articleId
+    ORDER BY bm.LaMediaChinh DESC, bm.ThuTuHienThi ASC, m.IDMedia DESC
+  `;
+
+  return query(sql, { articleId, language });
+}
+
 module.exports = {
   findAll,
   countAll,
@@ -232,5 +292,6 @@ module.exports = {
   findRegions,
   findEthnicGroups,
   findRelated,
-  findReferences
+  findReferences,
+  findMedia
 };

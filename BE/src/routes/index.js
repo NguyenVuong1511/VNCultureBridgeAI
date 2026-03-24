@@ -8,6 +8,7 @@ const searchRoutes = require('../modules/search/search.route');
 const feedbackRoutes = require('../modules/feedback/feedback.route');
 const authRoutes = require('../modules/auth/auth.route');
 const adminArticlesRoutes = require('../modules/admin-articles/adminArticles.route');
+const adminTaxonomyRoutes = require('../modules/admin-taxonomy/adminTaxonomy.route');
 
 const router = express.Router();
 
@@ -30,5 +31,6 @@ router.use('/search', searchRoutes);
 router.use('/feedback', feedbackRoutes);
 router.use('/admin/auth', authRoutes);
 router.use('/admin/articles', adminArticlesRoutes);
+router.use('/admin/taxonomy', adminTaxonomyRoutes);
 
 module.exports = router;
