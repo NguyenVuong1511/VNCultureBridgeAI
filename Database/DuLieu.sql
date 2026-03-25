@@ -382,24 +382,23 @@ BEGIN TRY
     );
 
     INSERT INTO BAI_VIET_DAN_TOC (IDBaiViet, IDDanToc, LoaiLienHe)
-    SELECT b.IDBaiViet, dt.IDDanToc, v.LoaiLienHe
-    FROM (VALUES
-        (N'tet-nguyen-dan-viet-nam',                    'KINH',  'PHO_BIEN'),
-        (N'khong-gian-van-hoa-cong-chieng-tay-nguyen', 'EDE',   'THUC_HANH'),
-        (N'khong-gian-van-hoa-cong-chieng-tay-nguyen', 'HMONG', 'LIEN_QUAN'),
-        (N'ao-dai-viet-nam',                           'KINH',  'LIEN_QUAN'),
-        (N'ao-dai-viet-nam',                           'CHAM',  'LIEN_QUAN')
-    ) v(DuongDanSeo, MaDanToc, LoaiLienHe)
-    INNER JOIN BAI_VIET b ON b.DuongDanSeo = v.DuongDanSeo
-    INNER JOIN DAN_TOC dt ON dt.MaDanToc = v.MaDanToc
-    WHERE NOT EXISTS
-    (
-        SELECT 1
-        FROM BAI_VIET_DAN_TOC x
-        WHERE x.IDBaiViet = b.IDBaiViet
-          AND x.IDDanToc = dt.IDDanToc
-    );
-
+SELECT b.IDBaiViet, dt.IDDanToc, v.LoaiLienHe
+FROM (VALUES
+    (N'tet-nguyen-dan-viet-nam',                    'KINH',  'LIEN_QUAN'),
+    (N'khong-gian-van-hoa-cong-chieng-tay-nguyen', 'EDE',   'THUC_HANH'),
+    (N'khong-gian-van-hoa-cong-chieng-tay-nguyen', 'HMONG', 'LIEN_QUAN'),
+    (N'ao-dai-viet-nam',                           'KINH',  'LIEN_QUAN'),
+    (N'ao-dai-viet-nam',                           'CHAM',  'LIEN_QUAN')
+) v(DuongDanSeo, MaDanToc, LoaiLienHe)
+INNER JOIN BAI_VIET b ON b.DuongDanSeo = v.DuongDanSeo
+INNER JOIN DAN_TOC dt ON dt.MaDanToc = v.MaDanToc
+WHERE NOT EXISTS
+(
+    SELECT 1
+    FROM BAI_VIET_DAN_TOC x
+    WHERE x.IDBaiViet = b.IDBaiViet
+      AND x.IDDanToc = dt.IDDanToc
+);
     INSERT INTO BAI_VIET_THE (IDBaiViet, IDThe)
     SELECT b.IDBaiViet, t.IDThe
     FROM (VALUES
