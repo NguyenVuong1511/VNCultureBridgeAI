@@ -1,0 +1,187 @@
+/* src/components/auth/Auth.module.css */
+.authPage {
+  display: flex;
+  min-height: 100vh;
+  background-color: #FEEDD3;
+}
+
+/* BÊN TRÁI */
+.authLeft {
+  flex: 1;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #FEEDD3; /* Fallback color */
+  background-image: url("/img/Vn.webp");
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0;
+  transition: opacity 0.4s ease-in-out;
+  transform: translateZ(0); /* GPU acceleration */
+  will-change: opacity;
+  backface-visibility: hidden; /* Tối ưu rendering */
+}
+
+.authLeft.loaded {
+  opacity: 1;
+}
+
+.authLeft.error {
+  background-image: none;
+  background: linear-gradient(135deg, #FEEDD3 0%, #f5d4b0 100%);
+  opacity: 1;
+}
+
+/* Loading placeholder */
+.imagePlaceholder {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(90deg, #FEEDD3 0%, #f5e0c8 50%, #FEEDD3 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.skeleton {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, #FEEDD3 0%, #f5e0c8 50%, #FEEDD3 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.errorFallback {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(135deg, #FEEDD3 0%, #f5d4b0 100%);
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+/* BÊN PHẢI */
+.authRight {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  flex-direction: column;
+  justify-content: center;
+  padding: 60px 40px;
+  background-color: #FEEDD3;
+  gap: 15px;
+}
+
+/* FORM */
+.formContainer {
+  width: 100%;
+  max-width: 380px;
+  text-align: center;
+  background: #fff;
+  border-radius: 20px;
+  padding: 40px 35px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  transition: all 0.3s ease;
+}
+
+/* Logo + tiêu đề */
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 25px;
+  text-transform: uppercase;
+}
+
+.logo {
+  width: 70px;
+  height: 70px;
+  object-fit: contain;
+}
+
+h2 {
+  font-size: 1.5rem;
+  color: #C8201C;
+}
+
+.form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.input {
+  padding: 12px;
+  border: 1px solid #ccc;
+  border-radius: 10px;
+  font-size: 1rem;
+  background-color: white;
+  color: black;
+}
+
+.input:focus {
+  border-color: #C8201C;
+  outline: none;
+}
+
+.button {
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  background-color: #a62c2b;
+  color: #fff;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: 0.3s;
+  font-weight: bold;
+}
+
+.button:hover {
+  background-color: #8a1f1f;
+}
+
+.text {
+  margin-top: 15px;
+  color: #555;
+}
+
+.link {
+  color: #a62c2b;
+  text-decoration: none;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.link:hover {
+  text-decoration: underline;
+}
+
+.notification {
+  padding-top: 20px;
+  color: rgb(204, 0, 0);
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .authPage {
+    flex-direction: column;
+  }
+
+  .authLeft {
+    display: none;
+  }
+}

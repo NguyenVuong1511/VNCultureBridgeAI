@@ -1,0 +1,144 @@
+.ethnicSection {
+  padding: 100px 20px;
+  background-color: #ffffff;
+  overflow: hidden;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 60px;
+}
+
+.textContent {
+  flex: 1;
+  max-width: 400px;
+}
+
+.title {
+  font-size: 2.8rem;
+  font-weight: 800;
+  color: #1a1a1a;
+  margin-bottom: 24px;
+  line-height: 1.2;
+}
+
+.title span {
+  color: #d1b06b;
+}
+
+.description {
+  font-size: 1.1rem;
+  color: #666;
+  line-height: 1.8;
+  margin-bottom: 32px;
+}
+
+.exploreBtn {
+  display: inline-block;
+  padding: 14px 32px;
+  background-color: #d1b06b;
+  color: white;
+  text-decoration: none;
+  font-weight: 600;
+  border-radius: 30px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(209, 176, 107, 0.3);
+}
+
+.exploreBtn:hover {
+  background-color: #b89b5e;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(209, 176, 107, 0.4);
+}
+
+.cardsContainer {
+  flex: 2;
+  position: relative;
+  /* Allow horizontal scroll if needed, or flex wrap */
+}
+
+.cardTrack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
+}
+
+.card {
+  width: calc(50% - 10px);
+  max-width: 280px;
+  height: 320px;
+  border-radius: 16px;
+  overflow: hidden;
+  position: relative;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+.cardImagePlaceholder {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+
+.image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.5s ease;
+}
+
+.card:hover .image {
+  transform: scale(1.05);
+}
+
+.overlay {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
+  padding: 30px 20px 20px;
+  color: white;
+}
+
+.groupName {
+  font-size: 1.5rem;
+  font-weight: 700;
+  margin: 0;
+  letter-spacing: 1px;
+}
+
+.loading {
+  text-align: center;
+  padding: 60px 0;
+  font-size: 1.2rem;
+  color: #666;
+}
+
+@media (max-width: 992px) {
+  .container {
+    flex-direction: column;
+    text-align: center;
+    gap: 40px;
+  }
+
+  .textContent {
+    max-width: 100%;
+  }
+
+  .title {
+    font-size: 2.2rem;
+  }
+}
+
+@media (max-width: 600px) {
+  .card {
+    width: 100%;
+    max-width: 100%;
+    height: 250px;
+  }
+}

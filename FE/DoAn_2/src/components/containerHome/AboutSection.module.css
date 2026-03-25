@@ -1,0 +1,176 @@
+.about {
+  padding: 120px 20px;
+  background-color: white;
+}
+
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  text-align: center;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #C8201C;
+  margin-bottom: 20px;
+  text-transform: uppercase;
+}
+
+.desc {
+  font-size: 1.1rem;
+  color: #3a2a1a;
+  line-height: 1.7;
+  max-width: 950px;
+  margin: 0 auto 60px;
+  text-align: center;
+}
+
+.desc strong {
+  color: #C8201C;
+}
+
+/* SLIDESHOW */
+.slideshow {
+  position: relative;
+  max-width: 1250px;
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 16px;
+  padding-bottom: 10px;
+}
+
+.slideWrapper {
+  position: relative;
+  width: 100%;
+  height: 420px;
+}
+
+.slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  opacity: 0;
+  transition: opacity 0.8s ease-in-out;
+}
+
+.slide.active {
+  opacity: 1;
+  z-index: 1;
+}
+
+.slide img {
+  width: 100%;
+  height: 420px;
+  object-fit: cover;
+  border-radius: 16px;
+  filter: blur(1px);
+}
+
+.slide p {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  text-align: center;
+  color: #ffffff;
+  font-weight: 500;
+  font-size: 2.5rem;
+  text-shadow: 0 2px 5px rgb(0, 0, 0);
+  font-family: 'Vnthfap', Helvetica, Arial, sans-serif;
+}
+
+/* Dots */
+.dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 15px;
+}
+
+.dot {
+  width: 12px;
+  height: 12px;
+  background: #d3b08a;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.dot:hover {
+  background: #b88656;
+}
+
+.activeDot {
+  background: #8b4513;
+  transform: scale(1.2);
+}
+
+/* ====== RESPONSIVE ====== */
+@media (max-width: 768px) {
+  .about {
+    padding: 80px 15px;
+  }
+
+  .title {
+    font-size: 1.6rem;
+    margin-bottom: 15px;
+  }
+
+  .desc {
+    font-size: 1rem;
+    margin-bottom: 40px;
+    padding: 0 10px;
+  }
+
+  .slideshow {
+    max-width: 100%;
+    padding-bottom: 8px;
+  }
+
+  .slideWrapper {
+    height: 300px;
+  }
+
+  .slide img {
+    height: 300px;
+  }
+
+  .slide p {
+    font-size: 1.8rem;
+    padding: 0 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .about {
+    padding: 60px 10px;
+  }
+
+  .title {
+    font-size: 1.4rem;
+  }
+
+  .desc {
+    font-size: 0.95rem;
+    margin-bottom: 30px;
+  }
+
+  .slideWrapper {
+    height: 250px;
+  }
+
+  .slide img {
+    height: 250px;
+  }
+
+  .slide p {
+    font-size: 1.4rem;
+  }
+
+  .dot {
+    width: 10px;
+    height: 10px;
+  }
+}

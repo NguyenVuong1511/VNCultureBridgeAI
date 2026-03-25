@@ -23,6 +23,22 @@ async function createFeedback(req, res, next) {
   }
 }
 
+async function getPublicFeedbacks(req, res, next) {
+  try {
+    const data = await feedbackService.getPublicFeedbacks({
+      type: req.query.type
+    });
+
+    res.json(successResponse({
+      message: 'Lấy danh sách phản hồi thành công',
+      data
+    }));
+  } catch (error) {
+    next(error);
+  }
+}
+
 module.exports = {
-  createFeedback
+  createFeedback,
+  getPublicFeedbacks
 };

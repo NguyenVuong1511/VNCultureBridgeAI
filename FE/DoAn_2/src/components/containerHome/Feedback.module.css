@@ -1,0 +1,266 @@
+.feedbackSection {
+  padding: 120px 20px;
+  background: linear-gradient(0deg, #fff8f8 0%, #ffffff 50%, #fff8f8 100%);
+  color: #222;
+  text-align: center;
+}
+
+.feedbackTitle {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #C8201C;
+  text-transform: uppercase;
+  margin-bottom: 20px;
+}
+
+/* Form feedback */
+.feedbackForm {
+  max-width: 600px;
+  margin: 0 auto 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.feedbackForm input,
+.feedbackForm textarea {
+  padding: 12px 15px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+  outline: none;
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+.feedbackForm textarea {
+  resize: none;
+  min-height: 100px;
+  width: 100% !important;
+}
+
+.starRating {
+  display: flex;
+  gap: 15px;
+  justify-content: center;
+  margin-bottom: 10px;
+  cursor: pointer;
+}
+
+.star {
+  color: #ccc;
+  font-size: 1.8rem;
+  transition: color 0.3s ease;
+}
+
+.selected {
+  color: #fec816;
+}
+
+.submitBtn {
+  background-color: #C8201C;
+  color: #fff;
+  border: none;
+  padding: 15px 25px;
+  border-radius: 20px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s ease;
+}
+
+.submitBtn:hover {
+  background-color: #fec816;
+  color: #222;
+}
+
+.ratingSummary {
+  margin-bottom: 30px;
+  text-align: left;
+  max-width: 400px; /* hẹp vừa phải */
+  margin: 0 auto 30px;
+  font-size: 1rem;
+}
+
+.ratingGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr; /* 2 cột */
+  gap: 5px 20px; /* khoảng cách giữa các row và cột */
+}
+
+.ratingRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: bold;
+  color: #C8201C;
+}
+
+.stars {
+  display: flex;
+  gap: 2px;
+}
+
+.smallStar {
+  color: #fec816;
+  font-size: 1rem;
+}
+
+
+/* Feedback cards */
+.feedbackContainer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 30px;
+  justify-content: center;
+}
+
+.feedbackCard {
+  background-color: #fff;
+  border-radius: 20px;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+  padding: 25px 20px;
+  max-width: 350px;
+  flex: 1 1 300px;
+  position: relative;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feedbackCard:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 25px rgba(0,0,0,0.15);
+}
+
+.feedbackName {
+  font-weight: 700;
+  color: #C8201C;
+  margin-bottom: 5px;
+}
+
+.feedbackStars {
+  color: #fec816;
+  margin-bottom: 10px;
+}
+
+.feedbackText {
+  font-size: 1rem;
+  line-height: 1.6;
+  color: #3a2a1a;
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+/* Pagination */
+.pagination {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.pageBtn {
+  padding: 8px 12px;
+  border: 1px solid #C8201C;
+  border-radius: 8px;
+  background-color: #fff;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  color: black;
+}
+
+.pageBtn:hover {
+  background-color: #fec816;
+  color: #222;
+  
+}
+
+.activePage {
+  background-color: #C8201C;
+  color: #fff;
+}
+
+.btn {
+  padding: 8px 12px;
+  border: 1px solid #C8201C;
+  border-radius: 8px;
+  background-color: #e7e7e7;
+  cursor: pointer;
+  font-weight: bold;
+  transition: all 0.3s ease;
+  color: rgb(0, 0, 0);
+}
+
+/* ====== RESPONSIVE ====== */
+@media (max-width: 768px) {
+  .feedbackSection {
+    padding: 80px 15px;
+  }
+
+  .feedbackTitle {
+    font-size: 1.6rem;
+    margin-bottom: 15px;
+  }
+
+  .feedbackForm {
+    max-width: 100%;
+    gap: 12px;
+  }
+
+  .feedbackForm input,
+  .feedbackForm textarea {
+    padding: 10px 12px;
+    font-size: 0.95rem;
+  }
+
+  .ratingGrid {
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 5px 15px;
+  }
+
+  .feedbackContainer {
+    gap: 20px;
+  }
+
+  .feedbackCard {
+    max-width: 100%;
+    flex: 1 1 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .feedbackSection {
+    padding: 60px 10px;
+  }
+
+  .feedbackTitle {
+    font-size: 1.4rem;
+  }
+
+  .starRating {
+    gap: 10px;
+  }
+
+  .star {
+    font-size: 1.5rem;
+  }
+
+  .ratingGrid {
+    grid-template-columns: 1fr 1fr;
+    gap: 5px 10px;
+  }
+
+  .ratingSummary {
+    max-width: 100%;
+    font-size: 0.9rem;
+  }
+
+  .feedbackCard {
+    padding: 20px 15px;
+  }
+
+  .feedbackName {
+    font-size: 0.95rem;
+  }
+
+  .feedbackText {
+    font-size: 0.9rem;
+  }
+}

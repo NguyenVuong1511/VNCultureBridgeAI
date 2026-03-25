@@ -1,0 +1,381 @@
+/* ====== NAVBAR GỐC ====== */
+.container {
+  width: 100%;
+  height: 100%;
+}
+.navbar {
+  width: 100%;
+  height: 80px;
+  background-color: white;
+  border-bottom: 1px solid rgb(228, 228, 228);
+  position: fixed;
+  z-index: 1000;
+  top: 0;
+}
+
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0px 10px;
+}
+
+.logo {
+  width: 100%;
+  height: 100%;
+}
+
+.link {
+  text-decoration: none;
+  color: black;
+}
+
+.linkLogo {
+  display: block;
+  width: 56px;
+  height: 56px;
+}
+
+/* ====== BUTTON ====== */
+.btn {
+  border-radius: 20px;
+  padding: 8px 15px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.btnLogin {
+  border: 2px solid #C8201C;
+  background-color: #fff;
+  color: #C8201C;
+}
+.btnLogin:hover {
+  background-color: #FEC816;
+  color: #222;
+  border-color: #FEC816;
+}
+
+.btnRegister {
+  background-color: #C8201C;
+  color: #fff;
+  border: 2px solid #C8201C;
+  margin-left: 10px;
+}
+.btnRegister:hover {
+  background-color: #FEC816;
+  color: #222;
+  border-color: #FEC816;
+}
+
+/* ====== USER MENU ====== */
+.userMenu {
+  position: relative;
+}
+
+.userButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ccc;
+  transition: all 0.3s ease;
+}
+
+.avatar:hover {
+  border-color: #C8201C;
+}
+
+.username {
+  font-weight: 600;
+  color: #222;
+  font-size: 1rem;
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+.dropdown {
+  position: absolute;
+  top: 55px;
+  right: 0;
+  background-color: #fff;
+  border: 1px solid #e5e5e5;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  display: none;
+  flex-direction: column;
+  min-width: 180px;
+  overflow: hidden;
+  animation: fadeIn 0.2s ease;
+  z-index: 10;
+}
+
+.dropdown.show {
+  display: flex;
+}
+
+.dropdownItem {
+  padding: 10px 16px;
+  text-align: left;
+  font-size: 15px;
+  color: #333;
+  text-decoration: none;
+  background-color: white;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.dropdownItem:hover {
+  background-color: #f9f9f9;
+  color: #C8201C;
+}
+
+.divider {
+  border: none;
+  height: 1px;
+  background-color: #e0e0e0;
+  margin: 4px 0;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ====== BACK BUTTON ====== */
+.backButton {
+  background: none;
+  border: none;
+  color: #222;
+  font-size: 22px;
+  cursor: pointer;
+  margin-right: 12px;
+  display: flex;
+  align-items: center;
+  transition: color 0.2s ease;
+}
+
+.backButton:hover {
+  color: #C8201C;
+}
+
+/* ====== NAV LEFT & CENTER ====== */
+.navLeft {
+  display: flex;
+  align-items: center;
+}
+
+/* Thanh tìm kiếm ở giữa */
+.navCenter {
+  flex: 1;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.searchForm {
+  display: flex;
+  align-items: center;
+  border: 1px solid rgb(228, 228, 228);
+  border-radius: 20px;
+  overflow: hidden;
+  width: 60%;
+  max-width: 400px;
+  background: #fafafa;
+  transition: all 0.2s ease;
+}
+
+.searchForm:focus-within {
+  border-color: #C8201C;
+  background: white;
+}
+
+.searchInput {
+  color: black;
+  flex: 1;
+  padding: 7px 12px;
+  border: none;
+  outline: none;
+  font-size: 15px;
+  background: transparent;
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+.searchBtn {
+  background: #C8201C;
+  border: none;
+  color: white;
+  padding: 8px 14px;
+  cursor: pointer;
+  font-size: 15px;
+  transition: background 0.3s ease;
+}
+
+.searchBtn:hover {
+  background: #FEC816;
+  color: #222;
+}
+
+.linka {
+  margin-left: 20px;
+  font-weight: 500;
+  color: #222;
+  text-decoration: none;
+}
+
+.linka:hover {
+  color: #858585;
+}
+
+/* ====== MOBILE MENU ====== */
+.mobileMenuButton {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #222;
+  padding: 8px;
+  transition: color 0.2s ease;
+}
+
+.mobileMenuButton:hover {
+  color: #C8201C;
+}
+
+.mobileMenu {
+  display: none;
+  width: 100%;
+  padding: 15px;
+  background-color: white;
+  border-top: 1px solid rgb(228, 228, 228);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.mobileMenu.mobileMenuOpen {
+  display: block;
+}
+
+.mobileSearchForm {
+  display: flex;
+  align-items: center;
+  border: 1px solid rgb(228, 228, 228);
+  border-radius: 20px;
+  overflow: hidden;
+  width: 100%;
+  background: #fafafa;
+}
+
+.mobileSearchForm:focus-within {
+  border-color: #C8201C;
+  background: white;
+}
+
+/* ====== RESPONSIVE ====== */
+@media (max-width: 1024px) {
+  .searchForm {
+    width: 50%;
+    max-width: 350px;
+  }
+  
+  .navCenter {
+    flex: 0 1 auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    height: auto;
+    min-height: 80px;
+  }
+
+  .container {
+    flex-wrap: wrap;
+    padding: 10px 15px;
+  }
+
+  .navLeft {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .linka {
+    display: none;
+  }
+
+  .navCenter {
+    display: none;
+  }
+
+  .navRight {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .btn {
+    padding: 6px 12px;
+    font-size: 14px;
+  }
+
+  .btnRegister {
+    margin-left: 5px;
+  }
+
+  .mobileMenuButton {
+    display: block;
+  }
+
+  .username {
+    display: none;
+  }
+
+  .avatar {
+    width: 35px;
+    height: 35px;
+  }
+
+  .searchForm {
+    width: 100%;
+    max-width: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 8px 10px;
+  }
+
+  .linkLogo {
+    width: 45px;
+    height: 45px;
+  }
+
+  .btn {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .btnRegister {
+    margin-left: 3px;
+  }
+
+  .mobileMenu {
+    padding: 12px;
+  }
+}

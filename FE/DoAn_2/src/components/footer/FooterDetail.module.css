@@ -1,0 +1,13 @@
+.bottom {
+  text-align: center;
+  font-size: 0.9rem;
+  color: #555;
+  border-top: 1px solid rgb(228, 228, 228);
+  background-color: white;
+  padding: 10px;
+}
+
+.bottom span {
+  color: #C8201C;
+  font-weight: 700;
+}

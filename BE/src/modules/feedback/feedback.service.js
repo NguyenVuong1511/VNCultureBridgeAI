@@ -23,6 +23,14 @@ async function createFeedback(payload) {
   return feedbackRepository.createFeedback(payload);
 }
 
+async function getPublicFeedbacks(query) {
+  return feedbackRepository.getPublicFeedbacks({
+    type: query?.type || 'CHUNG',
+    status: 'DA_DUYET'
+  });
+}
+
 module.exports = {
-  createFeedback
+  createFeedback,
+  getPublicFeedbacks
 };

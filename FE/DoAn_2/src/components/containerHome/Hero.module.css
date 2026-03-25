@@ -1,0 +1,134 @@
+.hero {
+    margin-top: 80px;
+}
+
+.banner {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+
+
+
+.content {
+  position: relative;
+  z-index: 2;
+  text-align: center;
+  max-width: 800px;
+  padding: 0 20px;
+  color: #fff;
+  animation: fadeInUp 1s ease-in-out;
+  filter: none;
+}
+
+.content h1 {
+  font-size: 5rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  line-height: 1.2;
+  font-family: 'Vnthfap', Helvetica, Arial, sans-serif;
+  color: #F5F5F5;
+  text-shadow: 2px 2px 5px #000;
+}
+
+.content p {
+  font-size: 1.5rem;
+  margin-bottom: 2rem;
+  opacity: 0.9;
+  color: #eeeeee;
+  text-shadow: 2px 2px 5px #000;
+}
+
+.ctaBtn {
+  background: linear-gradient(90deg, #c8201c, #e53935);
+  color: #fff;
+  padding: 14px 32px;
+  border-radius: 30px;
+  border: none;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.25);
+}
+
+.ctaBtn:hover {
+  background: linear-gradient(90deg, #fec816, #ffb400);
+  color: #222;
+  transform: translateY(-3px);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+}
+
+/* ✨ Smooth entrance animation */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 1500px) {
+  .banner {
+    height: 70vh;
+  }
+}
+
+@media (max-width: 1300px) {
+  .banner {
+    height: 65vh;
+  }
+}
+
+@media (max-width: 768px) {
+  .banner {
+    height: 60vh;
+  }
+
+  .content h1 {
+    font-size: 3rem;
+  }
+
+  .content p {
+    font-size: 1rem;
+  }
+
+  .ctaBtn {
+    padding: 12px 28px;
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .banner {
+    height: 50vh;
+  }
+
+  .content {
+    padding: 0 15px;
+  }
+
+  .content h1 {
+    font-size: 2rem;
+    margin-bottom: 0.8rem;
+  }
+
+  .content p {
+    font-size: 1rem;
+    margin-bottom: 1.5rem;
+  }
+
+  .ctaBtn {
+    padding: 10px 24px;
+    font-size: 0.85rem;
+  }
+}

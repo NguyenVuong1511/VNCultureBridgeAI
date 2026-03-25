@@ -1,0 +1,305 @@
+/* ====== NAVBAR GỐC ====== */
+.navbar {
+  width: 100%;
+  height: 80px;
+  background-color: white;
+  border-bottom: 1px solid rgb(228, 228, 228);
+  position: fixed;
+  z-index: 1000;
+  top: 0;
+}
+
+.container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0px 10px;
+}
+
+.logo {
+  width: 100%;
+  height: 100%;
+}
+
+.link {
+  text-decoration: none;
+  color: black;
+}
+
+.linkLogo {
+  display: block;
+  width: 56px;
+  height: 56px;
+}
+
+.navItems {
+  display: flex;
+  list-style: none;
+  gap: 45px;
+  padding: 0;
+}
+
+.navItems li {
+  font-weight: 600;
+  font-size: 17px;
+  text-transform: uppercase;
+  text-align: center;
+}
+
+.navItem:hover {
+  color: #C8201C;
+}
+
+/* ====== BUTTON ====== */
+.btn {
+  border-radius: 20px;
+  padding: 8px 15px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.btnLogin {
+  border: 2px solid #C8201C;
+  background-color: #fff;
+  color: #C8201C;
+}
+
+.btnLogin:hover {
+  background-color: #FEC816;
+  color: #222;
+  border-color: #FEC816;
+}
+
+.btnRegister {
+  background-color: #C8201C;
+  color: #fff;
+  border: 2px solid #C8201C;
+  margin-left: 10px;
+}
+
+.btnRegister:hover {
+  background-color: #FEC816;
+  color: #222;
+  border-color: #FEC816;
+}
+
+/* ====== USER MENU ====== */
+.userMenu {
+  position: relative;
+}
+
+.userButton {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #ccc;
+  transition: all 0.3s ease;
+}
+
+.avatar:hover {
+  border-color: #C8201C;
+}
+
+.username {
+  font-weight: 600;
+  color: #222;
+  font-size: 1rem;
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+.dropdown {
+  position: absolute;
+  top: 55px;
+  right: 0;
+  background-color: #fff;
+  border: 1px solid #e5e5e5;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 8px;
+  display: none;
+  flex-direction: column;
+  min-width: 180px;
+  overflow: hidden;
+  animation: fadeIn 0.2s ease;
+  z-index: 10;
+}
+
+.dropdown.show {
+  display: flex;
+}
+
+.dropdownItem {
+  padding: 10px 16px;
+  text-align: left;
+  font-size: 15px;
+  color: #333;
+  text-decoration: none;
+  background-color: white;
+  border: none;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.dropdownItem:hover {
+  background-color: #f9f9f9;
+  color: #C8201C;
+}
+
+.divider {
+  border: none;
+  height: 1px;
+  background-color: #e0e0e0;
+  margin: 4px 0;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ====== MOBILE MENU BUTTON ====== */
+.mobileMenuButton {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #222;
+  padding: 8px;
+  transition: color 0.2s ease;
+}
+
+.mobileMenuButton:hover {
+  color: #C8201C;
+}
+
+/* ====== RESPONSIVE ====== */
+@media (max-width: 1024px) {
+  .navItems {
+    gap: 30px;
+  }
+
+  .navItems li {
+    font-size: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    height: auto;
+    min-height: 80px;
+  }
+
+  .container {
+    flex-wrap: wrap;
+    padding: 10px 15px;
+  }
+
+  .navLeft {
+    flex: 0 0 auto;
+  }
+
+  .navItems {
+    display: none;
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: white;
+    flex-direction: column;
+    gap: 0;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    border-top: 1px solid rgb(228, 228, 228);
+    z-index: 999;
+  }
+
+  .navItems.mobileMenuOpen {
+    display: flex;
+  }
+
+  .navItems li {
+    width: 100%;
+    padding: 12px 0;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 16px;
+  }
+
+  .navItems li:last-child {
+    border-bottom: none;
+  }
+
+  .navRight {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .btn {
+    padding: 6px 12px;
+    font-size: 14px;
+  }
+
+  .btnRegister {
+    margin-left: 5px;
+  }
+
+  .mobileMenuButton {
+    display: block;
+  }
+
+  .username {
+    display: none;
+  }
+
+  .avatar {
+    width: 35px;
+    height: 35px;
+  }
+}
+
+@media (max-width: 480px) {
+  .container {
+    padding: 8px 10px;
+  }
+
+  .linkLogo {
+    width: 45px;
+    height: 45px;
+  }
+
+  .btn {
+    padding: 6px 10px;
+    font-size: 12px;
+  }
+
+  .btnRegister {
+    margin-left: 3px;
+  }
+
+  .navItems {
+    padding: 15px;
+  }
+
+  .navItems li {
+    padding: 10px 0;
+    font-size: 15px;
+  }
+}

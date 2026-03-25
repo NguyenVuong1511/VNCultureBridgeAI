@@ -1,0 +1,230 @@
+.container {
+  max-width: 1100px;
+  margin: 0 auto;
+  text-align: center;
+  position: relative;
+  padding: 20px 0;
+}
+
+.places {
+  background: linear-gradient(0deg, #fff8f8 0%, #ffffff 50%, #fff8f8 100%);
+  padding: 120px 20px;
+}
+
+/* Tiêu đề lớn */
+.title {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #C8201C;
+  text-transform: uppercase;
+  margin-bottom: 10px;
+}
+
+/* Mô tả ngắn */
+.subtitle {
+  font-size: 1.1rem;
+  color: #3a2a1a;
+  line-height: 1.7;
+  max-width: 950px;
+  margin: 0 auto 60px;
+  text-align: center;
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+}
+
+.map {
+  width: 402px;
+  height: 549px;
+}
+
+.link {
+  position: absolute;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  color: black;
+  font-weight: bold;
+  font-size: 1rem;
+  text-decoration: none;
+}
+
+.link:hover {
+  color: #a5190e;
+}
+
+/* NORTHERN VIETNAM HOTSPOT */
+.north {
+  width: 170px;
+  height: 150px;
+  top: 0%;
+  left: 65%;
+  pointer-events: auto;
+}
+
+.north::before {
+  content: "";
+  position: absolute;
+  width: 234px;
+  height: 156px;
+  top: 0;
+  left: -380px;
+  background: url("/img/flyout-map-north-active.png") 
+    no-repeat center center / contain;
+  opacity: 0;
+  transition: 0.3s;
+}
+
+.north:hover::before {
+  opacity: 1;
+}
+
+.central {
+  width: 170px;
+  height: 150px;
+  top: 35%;
+  left: 75%;
+  pointer-events: auto;
+}
+
+.central::before {
+  content: "";
+  position: absolute;
+  width: 225px;
+  height: 400px;
+  top: -100px;
+  left: -425px;
+  background: url("/img/flyout-map-central-active.png") 
+    no-repeat center center / contain;
+  opacity: 0;
+  transition: 0.3s;
+}
+
+.central:hover::before {
+  opacity: 1;
+}
+
+.south {
+  width: 170px;
+  height: 150px;
+  top: 75%;
+  left: 70%;
+  pointer-events: auto;
+}
+
+.south::before {
+  content: "";
+  position: absolute;
+  width: 172px;
+  height: 163px;
+  top: -30px;
+  left: -385px;
+  background: url("/img/flyout-map-south-active.png") 
+    no-repeat center center / contain;
+  opacity: 0;
+  transition: 0.3s;
+}
+
+.south:hover::before {
+  opacity: 1;
+}
+
+/* ====== RESPONSIVE ====== */
+@media (max-width: 1024px) {
+  .map {
+    width: 100%;
+    max-width: 402px;
+    height: auto;
+    aspect-ratio: 402 / 549;
+  }
+
+  .north::before,
+  .central::before,
+  .south::before {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .places {
+    padding: 80px 15px;
+  }
+
+  .title {
+    font-size: 1.6rem;
+    margin-bottom: 8px;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+    margin-bottom: 40px;
+    padding: 0 10px;
+  }
+
+  .map {
+    width: 100%;
+    max-width: 350px;
+  }
+
+  .north,
+  .central,
+  .south {
+    width: 120px;
+    height: 100px;
+  }
+
+  .north {
+    top: 2%;
+    left: 60%;
+  }
+
+  .central {
+    top: 38%;
+    left: 70%;
+  }
+
+  .south {
+    top: 78%;
+    left: 65%;
+  }
+}
+
+@media (max-width: 480px) {
+  .places {
+    padding: 60px 10px;
+  }
+
+  .title {
+    font-size: 1.4rem;
+  }
+
+  .subtitle {
+    font-size: 0.95rem;
+    margin-bottom: 30px;
+  }
+
+  .map {
+    max-width: 100%;
+  }
+
+  .north,
+  .central,
+  .south {
+    width: 100px;
+    height: 80px;
+    font-size: 0.85rem;
+  }
+
+  .north {
+    top: 3%;
+    left: 55%;
+  }
+
+  .central {
+    top: 40%;
+    left: 65%;
+  }
+
+  .south {
+    top: 80%;
+    left: 60%;
+  }
+}
