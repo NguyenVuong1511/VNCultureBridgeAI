@@ -1753,3 +1753,2299 @@ GO
    - PHAN_HOI_NOI_DUNG / NHAT_KY_TIM_KIEM / NHAT_KY_XEM_BAI_VIET / NHAT_KY_QUAN_TRI phuc vu dashboard va cai tien lien tuc.
    ========================================================= */
 
+
+   USE VNCultureBridgeAI;
+SET NOCOUNT ON;
+
+BEGIN TRY
+    BEGIN TRAN;
+
+    /* =========================================================
+       0. BIEN DUNG CHUNG
+       ========================================================= */
+    DECLARE 
+        @SuperAdminId BIGINT,
+        @ContentAdminId BIGINT,
+        @ReviewerId BIGINT,
+        @AIAdminId BIGINT,
+
+        @BaiTet BIGINT,
+        @BaiThoCung BIGINT,
+        @BaiAoDai BIGINT,
+        @BaiCaTru BIGINT,
+        @BaiNhaRong BIGINT,
+        @BaiPho BIGINT,
+        @BaiCongChieng BIGINT,
+
+        @NguonTet BIGINT,
+        @NguonThoCung BIGINT,
+        @NguonAoDai BIGINT,
+        @NguonCaTru BIGINT,
+        @NguonNhaRong BIGINT,
+        @NguonPho BIGINT,
+        @NguonCongChieng BIGINT,
+
+        @MediaTet BIGINT,
+        @MediaThoCung BIGINT,
+        @MediaAoDai BIGINT,
+        @MediaCaTru BIGINT,
+        @MediaNhaRong BIGINT,
+        @MediaPho BIGINT,
+        @MediaCongChieng BIGINT,
+
+        @PhienKhachEN UNIQUEIDENTIFIER,
+        @PhienKhachVI UNIQUEIDENTIFIER,
+        @PhienChat1 UNIQUEIDENTIFIER,
+        @PhienChat2 UNIQUEIDENTIFIER,
+
+        @TinNhanAI1 BIGINT,
+        @TinNhanAI2 BIGINT,
+        @TinNhanAI3 BIGINT,
+
+        @DotDongBo1 BIGINT,
+
+        @TaiLieuTetVI BIGINT,
+        @TaiLieuTetEN BIGINT,
+        @TaiLieuThoCungEN BIGINT,
+        @TaiLieuAoDaiEN BIGINT,
+
+        @DoanTetVI1 BIGINT,
+        @DoanTetEN1 BIGINT,
+        @DoanThoCungEN1 BIGINT,
+        @DoanAoDaiEN1 BIGINT;
+
+    /* =========================================================
+       1. USER QUAN TRI
+       ========================================================= */
+    IF NOT EXISTS (SELECT 1 FROM QUAN_TRI_NGUOI_DUNG WHERE TenDangNhap = N'superadmin')
+    BEGIN
+        INSERT INTO QUAN_TRI_NGUOI_DUNG
+        (
+            TenDangNhap, Email, MatKhauHash, HoTen, TrangThai, LanDangNhapCuoi
+        )
+        VALUES
+        (
+            N'superadmin',
+            N'superadmin@vnculturebridge.ai',
+            N'hash_superadmin_demo',
+            N'Nguyễn Quản Trị Tổng',
+            'HOAT_DONG',
+            SYSUTCDATETIME()
+        );
+    END;
+
+    IF NOT EXISTS (SELECT 1 FROM QUAN_TRI_NGUOI_DUNG WHERE TenDangNhap = N'contentadmin')
+    BEGIN
+        INSERT INTO QUAN_TRI_NGUOI_DUNG
+        (
+            TenDangNhap, Email, MatKhauHash, HoTen, TrangThai, LanDangNhapCuoi
+        )
+        VALUES
+        (
+            N'contentadmin',
+            N'contentadmin@vnculturebridge.ai',
+            N'hash_content_admin_demo',
+            N'Trần Biên Tập Nội Dung',
+            'HOAT_DONG',
+            SYSUTCDATETIME()
+        );
+    END;
+
+    IF NOT EXISTS (SELECT 1 FROM QUAN_TRI_NGUOI_DUNG WHERE TenDangNhap = N'reviewer')
+    BEGIN
+        INSERT INTO QUAN_TRI_NGUOI_DUNG
+        (
+            TenDangNhap, Email, MatKhauHash, HoTen, TrangThai, LanDangNhapCuoi
+        )
+        VALUES
+        (
+            N'reviewer',
+            N'reviewer@vnculturebridge.ai',
+            N'hash_reviewer_demo',
+            N'Lê Kiểm Duyệt',
+            'HOAT_DONG',
+            SYSUTCDATETIME()
+        );
+    END;
+
+    IF NOT EXISTS (SELECT 1 FROM QUAN_TRI_NGUOI_DUNG WHERE TenDangNhap = N'aiadmin')
+    BEGIN
+        INSERT INTO QUAN_TRI_NGUOI_DUNG
+        (
+            TenDangNhap, Email, MatKhauHash, HoTen, TrangThai, LanDangNhapCuoi
+        )
+        VALUES
+        (
+            N'aiadmin',
+            N'aiadmin@vnculturebridge.ai',
+            N'hash_ai_admin_demo',
+            N'Phạm Quản Trị AI',
+            'HOAT_DONG',
+            SYSUTCDATETIME()
+        );
+    END;
+
+    SELECT @SuperAdminId = IDNguoiDung FROM QUAN_TRI_NGUOI_DUNG WHERE TenDangNhap = N'superadmin';
+    SELECT @ContentAdminId = IDNguoiDung FROM QUAN_TRI_NGUOI_DUNG WHERE TenDangNhap = N'contentadmin';
+    SELECT @ReviewerId = IDNguoiDung FROM QUAN_TRI_NGUOI_DUNG WHERE TenDangNhap = N'reviewer';
+    SELECT @AIAdminId = IDNguoiDung FROM QUAN_TRI_NGUOI_DUNG WHERE TenDangNhap = N'aiadmin';
+
+    IF NOT EXISTS (
+        SELECT 1
+        FROM QUAN_TRI_NGUOI_DUNG_VAI_TRO uv
+        INNER JOIN QUAN_TRI_VAI_TRO v ON uv.IDVaiTro = v.IDVaiTro
+        WHERE uv.IDNguoiDung = @SuperAdminId AND v.MaVaiTro = 'SUPER_ADMIN'
+    )
+    BEGIN
+        INSERT INTO QUAN_TRI_NGUOI_DUNG_VAI_TRO (IDNguoiDung, IDVaiTro, IDNguoiGan)
+        SELECT @SuperAdminId, IDVaiTro, @SuperAdminId
+        FROM QUAN_TRI_VAI_TRO
+        WHERE MaVaiTro = 'SUPER_ADMIN';
+    END;
+
+    IF NOT EXISTS (
+        SELECT 1
+        FROM QUAN_TRI_NGUOI_DUNG_VAI_TRO uv
+        INNER JOIN QUAN_TRI_VAI_TRO v ON uv.IDVaiTro = v.IDVaiTro
+        WHERE uv.IDNguoiDung = @ContentAdminId AND v.MaVaiTro = 'CONTENT_ADMIN'
+    )
+    BEGIN
+        INSERT INTO QUAN_TRI_NGUOI_DUNG_VAI_TRO (IDNguoiDung, IDVaiTro, IDNguoiGan)
+        SELECT @ContentAdminId, IDVaiTro, @SuperAdminId
+        FROM QUAN_TRI_VAI_TRO
+        WHERE MaVaiTro = 'CONTENT_ADMIN';
+    END;
+
+    IF NOT EXISTS (
+        SELECT 1
+        FROM QUAN_TRI_NGUOI_DUNG_VAI_TRO uv
+        INNER JOIN QUAN_TRI_VAI_TRO v ON uv.IDVaiTro = v.IDVaiTro
+        WHERE uv.IDNguoiDung = @ReviewerId AND v.MaVaiTro = 'REVIEWER'
+    )
+    BEGIN
+        INSERT INTO QUAN_TRI_NGUOI_DUNG_VAI_TRO (IDNguoiDung, IDVaiTro, IDNguoiGan)
+        SELECT @ReviewerId, IDVaiTro, @SuperAdminId
+        FROM QUAN_TRI_VAI_TRO
+        WHERE MaVaiTro = 'REVIEWER';
+    END;
+
+    IF NOT EXISTS (
+        SELECT 1
+        FROM QUAN_TRI_NGUOI_DUNG_VAI_TRO uv
+        INNER JOIN QUAN_TRI_VAI_TRO v ON uv.IDVaiTro = v.IDVaiTro
+        WHERE uv.IDNguoiDung = @AIAdminId AND v.MaVaiTro = 'AI_ADMIN'
+    )
+    BEGIN
+        INSERT INTO QUAN_TRI_NGUOI_DUNG_VAI_TRO (IDNguoiDung, IDVaiTro, IDNguoiGan)
+        SELECT @AIAdminId, IDVaiTro, @SuperAdminId
+        FROM QUAN_TRI_VAI_TRO
+        WHERE MaVaiTro = 'AI_ADMIN';
+    END;
+
+    /* =========================================================
+       2. DAM BAO DANH MUC CHU DE CO SAN
+       ========================================================= */
+    IF NOT EXISTS (SELECT 1 FROM DANH_MUC_CHU_DE WHERE MaDanhMuc = 'LE_HOI')
+        INSERT INTO DANH_MUC_CHU_DE (MaDanhMuc, ThuTuSapXep, HoatDong) VALUES ('LE_HOI', 1, 1);
+
+    IF NOT EXISTS (SELECT 1 FROM DANH_MUC_CHU_DE WHERE MaDanhMuc = 'TIN_NGUONG')
+        INSERT INTO DANH_MUC_CHU_DE (MaDanhMuc, ThuTuSapXep, HoatDong) VALUES ('TIN_NGUONG', 2, 1);
+
+    IF NOT EXISTS (SELECT 1 FROM DANH_MUC_CHU_DE WHERE MaDanhMuc = 'PHONG_TUC')
+        INSERT INTO DANH_MUC_CHU_DE (MaDanhMuc, ThuTuSapXep, HoatDong) VALUES ('PHONG_TUC', 3, 1);
+
+    IF NOT EXISTS (SELECT 1 FROM DANH_MUC_CHU_DE WHERE MaDanhMuc = 'AM_THUC')
+        INSERT INTO DANH_MUC_CHU_DE (MaDanhMuc, ThuTuSapXep, HoatDong) VALUES ('AM_THUC', 4, 1);
+
+    IF NOT EXISTS (SELECT 1 FROM DANH_MUC_CHU_DE WHERE MaDanhMuc = 'TRANG_PHUC')
+        INSERT INTO DANH_MUC_CHU_DE (MaDanhMuc, ThuTuSapXep, HoatDong) VALUES ('TRANG_PHUC', 5, 1);
+
+    IF NOT EXISTS (SELECT 1 FROM DANH_MUC_CHU_DE WHERE MaDanhMuc = 'NGHE_THUAT_DAN_GIAN')
+        INSERT INTO DANH_MUC_CHU_DE (MaDanhMuc, ThuTuSapXep, HoatDong) VALUES ('NGHE_THUAT_DAN_GIAN', 6, 1);
+
+    IF NOT EXISTS (SELECT 1 FROM DANH_MUC_CHU_DE WHERE MaDanhMuc = 'KIEN_TRUC')
+        INSERT INTO DANH_MUC_CHU_DE (MaDanhMuc, ThuTuSapXep, HoatDong) VALUES ('KIEN_TRUC', 7, 1);
+
+    IF NOT EXISTS (SELECT 1 FROM DANH_MUC_CHU_DE WHERE MaDanhMuc = 'BIEU_TUONG')
+        INSERT INTO DANH_MUC_CHU_DE (MaDanhMuc, ThuTuSapXep, HoatDong) VALUES ('BIEU_TUONG', 8, 1);
+
+    INSERT INTO DANH_MUC_CHU_DE_BAN_DICH (IDDanhMuc, MaNgonNgu, TenDanhMuc, MoTa)
+    SELECT d.IDDanhMuc, 'vi',
+           CASE d.MaDanhMuc
+                WHEN 'LE_HOI' THEN N'Lễ hội'
+                WHEN 'TIN_NGUONG' THEN N'Tín ngưỡng'
+                WHEN 'PHONG_TUC' THEN N'Phong tục'
+                WHEN 'AM_THUC' THEN N'Ẩm thực'
+                WHEN 'TRANG_PHUC' THEN N'Trang phục'
+                WHEN 'NGHE_THUAT_DAN_GIAN' THEN N'Nghệ thuật dân gian'
+                WHEN 'KIEN_TRUC' THEN N'Kiến trúc'
+                WHEN 'BIEU_TUONG' THEN N'Biểu tượng văn hoá'
+           END,
+           NULL
+    FROM DANH_MUC_CHU_DE d
+    WHERE d.MaDanhMuc IN ('LE_HOI','TIN_NGUONG','PHONG_TUC','AM_THUC','TRANG_PHUC','NGHE_THUAT_DAN_GIAN','KIEN_TRUC','BIEU_TUONG')
+      AND NOT EXISTS (
+          SELECT 1 FROM DANH_MUC_CHU_DE_BAN_DICH x
+          WHERE x.IDDanhMuc = d.IDDanhMuc AND x.MaNgonNgu = 'vi'
+      );
+
+    INSERT INTO DANH_MUC_CHU_DE_BAN_DICH (IDDanhMuc, MaNgonNgu, TenDanhMuc, MoTa)
+    SELECT d.IDDanhMuc, 'en',
+           CASE d.MaDanhMuc
+                WHEN 'LE_HOI' THEN N'Festivals'
+                WHEN 'TIN_NGUONG' THEN N'Beliefs'
+                WHEN 'PHONG_TUC' THEN N'Customs'
+                WHEN 'AM_THUC' THEN N'Cuisine'
+                WHEN 'TRANG_PHUC' THEN N'Costume'
+                WHEN 'NGHE_THUAT_DAN_GIAN' THEN N'Folk Arts'
+                WHEN 'KIEN_TRUC' THEN N'Architecture'
+                WHEN 'BIEU_TUONG' THEN N'Cultural Symbols'
+           END,
+           NULL
+    FROM DANH_MUC_CHU_DE d
+    WHERE d.MaDanhMuc IN ('LE_HOI','TIN_NGUONG','PHONG_TUC','AM_THUC','TRANG_PHUC','NGHE_THUAT_DAN_GIAN','KIEN_TRUC','BIEU_TUONG')
+      AND NOT EXISTS (
+          SELECT 1 FROM DANH_MUC_CHU_DE_BAN_DICH x
+          WHERE x.IDDanhMuc = d.IDDanhMuc AND x.MaNgonNgu = 'en'
+      );
+
+    /* =========================================================
+       3. DAM BAO VUNG VAN HOA CO SAN
+       ========================================================= */
+    IF NOT EXISTS (SELECT 1 FROM VUNG_VAN_HOA WHERE MaVung = 'MIEN_BAC')
+        INSERT INTO VUNG_VAN_HOA (MaVung, LoaiVung, ThuTuSapXep, HoatDong) VALUES ('MIEN_BAC', 'VAN_HOA', 1, 1);
+
+    IF NOT EXISTS (SELECT 1 FROM VUNG_VAN_HOA WHERE MaVung = 'MIEN_TRUNG')
+        INSERT INTO VUNG_VAN_HOA (MaVung, LoaiVung, ThuTuSapXep, HoatDong) VALUES ('MIEN_TRUNG', 'VAN_HOA', 2, 1);
+
+    IF NOT EXISTS (SELECT 1 FROM VUNG_VAN_HOA WHERE MaVung = 'MIEN_NAM')
+        INSERT INTO VUNG_VAN_HOA (MaVung, LoaiVung, ThuTuSapXep, HoatDong) VALUES ('MIEN_NAM', 'VAN_HOA', 3, 1);
+
+    IF NOT EXISTS (SELECT 1 FROM VUNG_VAN_HOA WHERE MaVung = 'TAY_NGUYEN')
+        INSERT INTO VUNG_VAN_HOA (MaVung, LoaiVung, ThuTuSapXep, HoatDong) VALUES ('TAY_NGUYEN', 'VAN_HOA', 4, 1);
+
+    IF NOT EXISTS (SELECT 1 FROM VUNG_VAN_HOA WHERE MaVung = 'DONG_BANG_SONG_CUU_LONG')
+        INSERT INTO VUNG_VAN_HOA (MaVung, LoaiVung, ThuTuSapXep, HoatDong) VALUES ('DONG_BANG_SONG_CUU_LONG', 'VAN_HOA', 5, 1);
+
+    INSERT INTO VUNG_VAN_HOA_BAN_DICH (IDVung, MaNgonNgu, TenVung, MoTa)
+    SELECT v.IDVung, 'vi',
+           CASE v.MaVung
+                WHEN 'MIEN_BAC' THEN N'Miền Bắc'
+                WHEN 'MIEN_TRUNG' THEN N'Miền Trung'
+                WHEN 'MIEN_NAM' THEN N'Miền Nam'
+                WHEN 'TAY_NGUYEN' THEN N'Tây Nguyên'
+                WHEN 'DONG_BANG_SONG_CUU_LONG' THEN N'Đồng bằng sông Cửu Long'
+           END,
+           NULL
+    FROM VUNG_VAN_HOA v
+    WHERE v.MaVung IN ('MIEN_BAC','MIEN_TRUNG','MIEN_NAM','TAY_NGUYEN','DONG_BANG_SONG_CUU_LONG')
+      AND NOT EXISTS (
+          SELECT 1 FROM VUNG_VAN_HOA_BAN_DICH x
+          WHERE x.IDVung = v.IDVung AND x.MaNgonNgu = 'vi'
+      );
+
+    INSERT INTO VUNG_VAN_HOA_BAN_DICH (IDVung, MaNgonNgu, TenVung, MoTa)
+    SELECT v.IDVung, 'en',
+           CASE v.MaVung
+                WHEN 'MIEN_BAC' THEN N'Northern Region'
+                WHEN 'MIEN_TRUNG' THEN N'Central Region'
+                WHEN 'MIEN_NAM' THEN N'Southern Region'
+                WHEN 'TAY_NGUYEN' THEN N'Central Highlands'
+                WHEN 'DONG_BANG_SONG_CUU_LONG' THEN N'Mekong Delta'
+           END,
+           NULL
+    FROM VUNG_VAN_HOA v
+    WHERE v.MaVung IN ('MIEN_BAC','MIEN_TRUNG','MIEN_NAM','TAY_NGUYEN','DONG_BANG_SONG_CUU_LONG')
+      AND NOT EXISTS (
+          SELECT 1 FROM VUNG_VAN_HOA_BAN_DICH x
+          WHERE x.IDVung = v.IDVung AND x.MaNgonNgu = 'en'
+      );
+
+    /* =========================================================
+       4. DAN TOC
+       ========================================================= */
+    IF NOT EXISTS (SELECT 1 FROM DAN_TOC WHERE MaDanToc = 'KINH')
+        INSERT INTO DAN_TOC (MaDanToc, ThuTuSapXep, HoatDong) VALUES ('KINH', 1, 1);
+
+    IF NOT EXISTS (SELECT 1 FROM DAN_TOC WHERE MaDanToc = 'TAY')
+        INSERT INTO DAN_TOC (MaDanToc, ThuTuSapXep, HoatDong) VALUES ('TAY', 2, 1);
+
+    IF NOT EXISTS (SELECT 1 FROM DAN_TOC WHERE MaDanToc = 'HMONG')
+        INSERT INTO DAN_TOC (MaDanToc, ThuTuSapXep, HoatDong) VALUES ('HMONG', 3, 1);
+
+    IF NOT EXISTS (SELECT 1 FROM DAN_TOC WHERE MaDanToc = 'CHAM')
+        INSERT INTO DAN_TOC (MaDanToc, ThuTuSapXep, HoatDong) VALUES ('CHAM', 4, 1);
+
+    IF NOT EXISTS (SELECT 1 FROM DAN_TOC WHERE MaDanToc = 'EDE')
+        INSERT INTO DAN_TOC (MaDanToc, ThuTuSapXep, HoatDong) VALUES ('EDE', 5, 1);
+
+    IF NOT EXISTS (SELECT 1 FROM DAN_TOC WHERE MaDanToc = 'KHMER')
+        INSERT INTO DAN_TOC (MaDanToc, ThuTuSapXep, HoatDong) VALUES ('KHMER', 6, 1);
+
+    INSERT INTO DAN_TOC_BAN_DICH (IDDanToc, MaNgonNgu, TenDanToc, MoTa)
+    SELECT d.IDDanToc, 'vi',
+           CASE d.MaDanToc
+                WHEN 'KINH' THEN N'Kinh'
+                WHEN 'TAY' THEN N'Tày'
+                WHEN 'HMONG' THEN N'H’Mông'
+                WHEN 'CHAM' THEN N'Chăm'
+                WHEN 'EDE' THEN N'Ê Đê'
+                WHEN 'KHMER' THEN N'Khmer'
+           END,
+           NULL
+    FROM DAN_TOC d
+    WHERE d.MaDanToc IN ('KINH','TAY','HMONG','CHAM','EDE','KHMER')
+      AND NOT EXISTS (
+          SELECT 1 FROM DAN_TOC_BAN_DICH x
+          WHERE x.IDDanToc = d.IDDanToc AND x.MaNgonNgu = 'vi'
+      );
+
+    INSERT INTO DAN_TOC_BAN_DICH (IDDanToc, MaNgonNgu, TenDanToc, MoTa)
+    SELECT d.IDDanToc, 'en',
+           CASE d.MaDanToc
+                WHEN 'KINH' THEN N'Kinh'
+                WHEN 'TAY' THEN N'Tay'
+                WHEN 'HMONG' THEN N'Hmong'
+                WHEN 'CHAM' THEN N'Cham'
+                WHEN 'EDE' THEN N'Ede'
+                WHEN 'KHMER' THEN N'Khmer'
+           END,
+           NULL
+    FROM DAN_TOC d
+    WHERE d.MaDanToc IN ('KINH','TAY','HMONG','CHAM','EDE','KHMER')
+      AND NOT EXISTS (
+          SELECT 1 FROM DAN_TOC_BAN_DICH x
+          WHERE x.IDDanToc = d.IDDanToc AND x.MaNgonNgu = 'en'
+      );
+
+    /* =========================================================
+       5. THE NOI DUNG
+       ========================================================= */
+    IF NOT EXISTS (SELECT 1 FROM THE_NOI_DUNG WHERE MaThe = 'TET')
+        INSERT INTO THE_NOI_DUNG (MaThe, HoatDong) VALUES ('TET', 1);
+
+    IF NOT EXISTS (SELECT 1 FROM THE_NOI_DUNG WHERE MaThe = 'THO_CUNG_TO_TIEN')
+        INSERT INTO THE_NOI_DUNG (MaThe, HoatDong) VALUES ('THO_CUNG_TO_TIEN', 1);
+
+    IF NOT EXISTS (SELECT 1 FROM THE_NOI_DUNG WHERE MaThe = 'AO_DAI')
+        INSERT INTO THE_NOI_DUNG (MaThe, HoatDong) VALUES ('AO_DAI', 1);
+
+    IF NOT EXISTS (SELECT 1 FROM THE_NOI_DUNG WHERE MaThe = 'CA_TRU')
+        INSERT INTO THE_NOI_DUNG (MaThe, HoatDong) VALUES ('CA_TRU', 1);
+
+    IF NOT EXISTS (SELECT 1 FROM THE_NOI_DUNG WHERE MaThe = 'NHA_RONG')
+        INSERT INTO THE_NOI_DUNG (MaThe, HoatDong) VALUES ('NHA_RONG', 1);
+
+    IF NOT EXISTS (SELECT 1 FROM THE_NOI_DUNG WHERE MaThe = 'PHO')
+        INSERT INTO THE_NOI_DUNG (MaThe, HoatDong) VALUES ('PHO', 1);
+
+    IF NOT EXISTS (SELECT 1 FROM THE_NOI_DUNG WHERE MaThe = 'CONG_CHIENG')
+        INSERT INTO THE_NOI_DUNG (MaThe, HoatDong) VALUES ('CONG_CHIENG', 1);
+
+    INSERT INTO THE_NOI_DUNG_BAN_DICH (IDThe, MaNgonNgu, TenThe, MoTa)
+    SELECT t.IDThe, 'vi',
+           CASE t.MaThe
+                WHEN 'TET' THEN N'Tết'
+                WHEN 'THO_CUNG_TO_TIEN' THEN N'Thờ cúng tổ tiên'
+                WHEN 'AO_DAI' THEN N'Áo dài'
+                WHEN 'CA_TRU' THEN N'Ca trù'
+                WHEN 'NHA_RONG' THEN N'Nhà rông'
+                WHEN 'PHO' THEN N'Phở'
+                WHEN 'CONG_CHIENG' THEN N'Cồng chiêng'
+           END,
+           NULL
+    FROM THE_NOI_DUNG t
+    WHERE t.MaThe IN ('TET','THO_CUNG_TO_TIEN','AO_DAI','CA_TRU','NHA_RONG','PHO','CONG_CHIENG')
+      AND NOT EXISTS (
+          SELECT 1 FROM THE_NOI_DUNG_BAN_DICH x
+          WHERE x.IDThe = t.IDThe AND x.MaNgonNgu = 'vi'
+      );
+
+    INSERT INTO THE_NOI_DUNG_BAN_DICH (IDThe, MaNgonNgu, TenThe, MoTa)
+    SELECT t.IDThe, 'en',
+           CASE t.MaThe
+                WHEN 'TET' THEN N'Tet'
+                WHEN 'THO_CUNG_TO_TIEN' THEN N'Ancestor Worship'
+                WHEN 'AO_DAI' THEN N'Ao Dai'
+                WHEN 'CA_TRU' THEN N'Ca Tru'
+                WHEN 'NHA_RONG' THEN N'Communal Stilt House'
+                WHEN 'PHO' THEN N'Pho'
+                WHEN 'CONG_CHIENG' THEN N'Gong Culture'
+           END,
+           NULL
+    FROM THE_NOI_DUNG t
+    WHERE t.MaThe IN ('TET','THO_CUNG_TO_TIEN','AO_DAI','CA_TRU','NHA_RONG','PHO','CONG_CHIENG')
+      AND NOT EXISTS (
+          SELECT 1 FROM THE_NOI_DUNG_BAN_DICH x
+          WHERE x.IDThe = t.IDThe AND x.MaNgonNgu = 'en'
+      );
+
+    /* =========================================================
+       6. TU KHOA
+       ========================================================= */
+    IF NOT EXISTS (SELECT 1 FROM TU_KHOA WHERE MaTuKhoa = 'TET_NGUYEN_DAN')
+        INSERT INTO TU_KHOA (MaTuKhoa, HoatDong) VALUES ('TET_NGUYEN_DAN', 1);
+
+    IF NOT EXISTS (SELECT 1 FROM TU_KHOA WHERE MaTuKhoa = 'ANCESTOR_WORSHIP')
+        INSERT INTO TU_KHOA (MaTuKhoa, HoatDong) VALUES ('ANCESTOR_WORSHIP', 1);
+
+    IF NOT EXISTS (SELECT 1 FROM TU_KHOA WHERE MaTuKhoa = 'AO_DAI')
+        INSERT INTO TU_KHOA (MaTuKhoa, HoatDong) VALUES ('AO_DAI', 1);
+
+    IF NOT EXISTS (SELECT 1 FROM TU_KHOA WHERE MaTuKhoa = 'CA_TRU')
+        INSERT INTO TU_KHOA (MaTuKhoa, HoatDong) VALUES ('CA_TRU', 1);
+
+    IF NOT EXISTS (SELECT 1 FROM TU_KHOA WHERE MaTuKhoa = 'NHA_RONG')
+        INSERT INTO TU_KHOA (MaTuKhoa, HoatDong) VALUES ('NHA_RONG', 1);
+
+    IF NOT EXISTS (SELECT 1 FROM TU_KHOA WHERE MaTuKhoa = 'PHO_BO')
+        INSERT INTO TU_KHOA (MaTuKhoa, HoatDong) VALUES ('PHO_BO', 1);
+
+    IF NOT EXISTS (SELECT 1 FROM TU_KHOA WHERE MaTuKhoa = 'CONG_CHIENG_TAY_NGUYEN')
+        INSERT INTO TU_KHOA (MaTuKhoa, HoatDong) VALUES ('CONG_CHIENG_TAY_NGUYEN', 1);
+
+    INSERT INTO TU_KHOA_BAN_DICH (IDTuKhoa, MaNgonNgu, TuKhoaHienThi)
+    SELECT k.IDTuKhoa, 'vi',
+           CASE k.MaTuKhoa
+                WHEN 'TET_NGUYEN_DAN' THEN N'Tết Nguyên Đán'
+                WHEN 'ANCESTOR_WORSHIP' THEN N'Thờ cúng tổ tiên'
+                WHEN 'AO_DAI' THEN N'Áo dài'
+                WHEN 'CA_TRU' THEN N'Ca trù'
+                WHEN 'NHA_RONG' THEN N'Nhà rông'
+                WHEN 'PHO_BO' THEN N'Phở bò'
+                WHEN 'CONG_CHIENG_TAY_NGUYEN' THEN N'Cồng chiêng Tây Nguyên'
+           END
+    FROM TU_KHOA k
+    WHERE k.MaTuKhoa IN ('TET_NGUYEN_DAN','ANCESTOR_WORSHIP','AO_DAI','CA_TRU','NHA_RONG','PHO_BO','CONG_CHIENG_TAY_NGUYEN')
+      AND NOT EXISTS (
+          SELECT 1 FROM TU_KHOA_BAN_DICH x
+          WHERE x.IDTuKhoa = k.IDTuKhoa AND x.MaNgonNgu = 'vi'
+      );
+
+    INSERT INTO TU_KHOA_BAN_DICH (IDTuKhoa, MaNgonNgu, TuKhoaHienThi)
+    SELECT k.IDTuKhoa, 'en',
+           CASE k.MaTuKhoa
+                WHEN 'TET_NGUYEN_DAN' THEN N'Tet Nguyen Dan'
+                WHEN 'ANCESTOR_WORSHIP' THEN N'Ancestor worship'
+                WHEN 'AO_DAI' THEN N'Ao Dai'
+                WHEN 'CA_TRU' THEN N'Ca Tru'
+                WHEN 'NHA_RONG' THEN N'Communal stilt house'
+                WHEN 'PHO_BO' THEN N'Pho bo'
+                WHEN 'CONG_CHIENG_TAY_NGUYEN' THEN N'Central Highlands gong culture'
+           END
+    FROM TU_KHOA k
+    WHERE k.MaTuKhoa IN ('TET_NGUYEN_DAN','ANCESTOR_WORSHIP','AO_DAI','CA_TRU','NHA_RONG','PHO_BO','CONG_CHIENG_TAY_NGUYEN')
+      AND NOT EXISTS (
+          SELECT 1 FROM TU_KHOA_BAN_DICH x
+          WHERE x.IDTuKhoa = k.IDTuKhoa AND x.MaNgonNgu = 'en'
+      );
+
+    /* =========================================================
+       7. NGUON THAM KHAO
+       ========================================================= */
+    IF NOT EXISTS (SELECT 1 FROM NGUON_THAM_KHAO WHERE TieuDeNguon = N'Tết Nguyên Đán và văn hoá sum họp gia đình ở Việt Nam')
+    BEGIN
+        INSERT INTO NGUON_THAM_KHAO
+        (
+            LoaiNguon, TieuDeNguon, TacGia, NhaXuatBan, NamXuatBan,
+            URLNguon, MaNgonNguNguon, GhiChu, MucDoTinCay,
+            DaXacMinh, IDNguoiXacMinh, NgayXacMinh
+        )
+        VALUES
+        (
+            'WEBSITE',
+            N'Tết Nguyên Đán và văn hoá sum họp gia đình ở Việt Nam',
+            N'Ban biên tập VNCultureBridge AI',
+            N'VNCultureBridge AI',
+            2026,
+            N'https://example.org/tet-nguyen-dan-viet-nam',
+            'vi',
+            N'Nguồn tham khảo mẫu cho bài viết Tết',
+            5,
+            1,
+            @ReviewerId,
+            SYSUTCDATETIME()
+        );
+    END;
+
+    IF NOT EXISTS (SELECT 1 FROM NGUON_THAM_KHAO WHERE TieuDeNguon = N'Ancestor worship and filial piety in Vietnamese culture')
+    BEGIN
+        INSERT INTO NGUON_THAM_KHAO
+        (
+            LoaiNguon, TieuDeNguon, TacGia, NhaXuatBan, NamXuatBan,
+            URLNguon, MaNgonNguNguon, GhiChu, MucDoTinCay,
+            DaXacMinh, IDNguoiXacMinh, NgayXacMinh
+        )
+        VALUES
+        (
+            'WEBSITE',
+            N'Ancestor worship and filial piety in Vietnamese culture',
+            N'Editorial Team',
+            N'VNCultureBridge AI',
+            2026,
+            N'https://example.org/ancestor-worship-vietnam',
+            'en',
+            N'Nguồn tham khảo mẫu cho tín ngưỡng thờ cúng tổ tiên',
+            5,
+            1,
+            @ReviewerId,
+            SYSUTCDATETIME()
+        );
+    END;
+
+    IF NOT EXISTS (SELECT 1 FROM NGUON_THAM_KHAO WHERE TieuDeNguon = N'Áo dài trong biểu tượng văn hoá Việt Nam hiện đại')
+    BEGIN
+        INSERT INTO NGUON_THAM_KHAO
+        (
+            LoaiNguon, TieuDeNguon, TacGia, NhaXuatBan, NamXuatBan,
+            URLNguon, MaNgonNguNguon, GhiChu, MucDoTinCay,
+            DaXacMinh, IDNguoiXacMinh, NgayXacMinh
+        )
+        VALUES
+        (
+            'WEBSITE',
+            N'Áo dài trong biểu tượng văn hoá Việt Nam hiện đại',
+            N'Nhóm nghiên cứu văn hoá',
+            N'VNCultureBridge AI',
+            2026,
+            N'https://example.org/ao-dai-vietnam',
+            'vi',
+            N'Nguồn tham khảo mẫu cho áo dài',
+            4,
+            1,
+            @ReviewerId,
+            SYSUTCDATETIME()
+        );
+    END;
+
+    IF NOT EXISTS (SELECT 1 FROM NGUON_THAM_KHAO WHERE TieuDeNguon = N'Ca trù as an intimate form of Northern Vietnamese performance')
+    BEGIN
+        INSERT INTO NGUON_THAM_KHAO
+        (
+            LoaiNguon, TieuDeNguon, TacGia, NhaXuatBan, NamXuatBan,
+            URLNguon, MaNgonNguNguon, GhiChu, MucDoTinCay,
+            DaXacMinh, IDNguoiXacMinh, NgayXacMinh
+        )
+        VALUES
+        (
+            'WEBSITE',
+            N'Ca trù as an intimate form of Northern Vietnamese performance',
+            N'Editorial Team',
+            N'VNCultureBridge AI',
+            2026,
+            N'https://example.org/ca-tru-vietnam',
+            'en',
+            N'Nguồn tham khảo mẫu cho ca trù',
+            4,
+            1,
+            @ReviewerId,
+            SYSUTCDATETIME()
+        );
+    END;
+
+    IF NOT EXISTS (SELECT 1 FROM NGUON_THAM_KHAO WHERE TieuDeNguon = N'Nhà rông và đời sống cộng đồng ở Tây Nguyên')
+    BEGIN
+        INSERT INTO NGUON_THAM_KHAO
+        (
+            LoaiNguon, TieuDeNguon, TacGia, NhaXuatBan, NamXuatBan,
+            URLNguon, MaNgonNguNguon, GhiChu, MucDoTinCay,
+            DaXacMinh, IDNguoiXacMinh, NgayXacMinh
+        )
+        VALUES
+        (
+            'WEBSITE',
+            N'Nhà rông và đời sống cộng đồng ở Tây Nguyên',
+            N'Tổ biên tập',
+            N'VNCultureBridge AI',
+            2026,
+            N'https://example.org/nha-rong-tay-nguyen',
+            'vi',
+            N'Nguồn tham khảo mẫu cho nhà rông',
+            4,
+            1,
+            @ReviewerId,
+            SYSUTCDATETIME()
+        );
+    END;
+
+    IF NOT EXISTS (SELECT 1 FROM NGUON_THAM_KHAO WHERE TieuDeNguon = N'Pho as a culinary symbol of Vietnam')
+    BEGIN
+        INSERT INTO NGUON_THAM_KHAO
+        (
+            LoaiNguon, TieuDeNguon, TacGia, NhaXuatBan, NamXuatBan,
+            URLNguon, MaNgonNguNguon, GhiChu, MucDoTinCay,
+            DaXacMinh, IDNguoiXacMinh, NgayXacMinh
+        )
+        VALUES
+        (
+            'WEBSITE',
+            N'Pho as a culinary symbol of Vietnam',
+            N'Editorial Team',
+            N'VNCultureBridge AI',
+            2026,
+            N'https://example.org/pho-vietnam',
+            'en',
+            N'Nguồn tham khảo mẫu cho phở',
+            4,
+            1,
+            @ReviewerId,
+            SYSUTCDATETIME()
+        );
+    END;
+
+    IF NOT EXISTS (SELECT 1 FROM NGUON_THAM_KHAO WHERE TieuDeNguon = N'Không gian văn hoá cồng chiêng Tây Nguyên')
+    BEGIN
+        INSERT INTO NGUON_THAM_KHAO
+        (
+            LoaiNguon, TieuDeNguon, TacGia, NhaXuatBan, NamXuatBan,
+            URLNguon, MaNgonNguNguon, GhiChu, MucDoTinCay,
+            DaXacMinh, IDNguoiXacMinh, NgayXacMinh
+        )
+        VALUES
+        (
+            'WEBSITE',
+            N'Không gian văn hoá cồng chiêng Tây Nguyên',
+            N'Tổ biên tập di sản',
+            N'VNCultureBridge AI',
+            2026,
+            N'https://example.org/cong-chieng-tay-nguyen',
+            'vi',
+            N'Nguồn tham khảo mẫu cho cồng chiêng',
+            5,
+            1,
+            @ReviewerId,
+            SYSUTCDATETIME()
+        );
+    END;
+
+    SELECT @NguonTet = IDNguon FROM NGUON_THAM_KHAO WHERE TieuDeNguon = N'Tết Nguyên Đán và văn hoá sum họp gia đình ở Việt Nam';
+    SELECT @NguonThoCung = IDNguon FROM NGUON_THAM_KHAO WHERE TieuDeNguon = N'Ancestor worship and filial piety in Vietnamese culture';
+    SELECT @NguonAoDai = IDNguon FROM NGUON_THAM_KHAO WHERE TieuDeNguon = N'Áo dài trong biểu tượng văn hoá Việt Nam hiện đại';
+    SELECT @NguonCaTru = IDNguon FROM NGUON_THAM_KHAO WHERE TieuDeNguon = N'Ca trù as an intimate form of Northern Vietnamese performance';
+    SELECT @NguonNhaRong = IDNguon FROM NGUON_THAM_KHAO WHERE TieuDeNguon = N'Nhà rông và đời sống cộng đồng ở Tây Nguyên';
+    SELECT @NguonPho = IDNguon FROM NGUON_THAM_KHAO WHERE TieuDeNguon = N'Pho as a culinary symbol of Vietnam';
+    SELECT @NguonCongChieng = IDNguon FROM NGUON_THAM_KHAO WHERE TieuDeNguon = N'Không gian văn hoá cồng chiêng Tây Nguyên';
+
+    /* =========================================================
+       8. MEDIA + BAN DICH MEDIA
+       ========================================================= */
+    IF NOT EXISTS (SELECT 1 FROM MEDIA WHERE TenTep = N'tet-nguyen-dan.jpg')
+    BEGIN
+        INSERT INTO MEDIA
+        (
+            LoaiMedia, TenTep, DuongDanTep, NhaCungCapLuuTru, MimeType,
+            KichThuocBytes, RongPx, CaoPx, ChuSoHuuBanQuyen, ThongTinGiayPhep,
+            TrangThai, IDNguoiTaiLen
+        )
+        VALUES
+        (
+            'HINH_ANH', N'tet-nguyen-dan.jpg', N'/media/tet-nguyen-dan.jpg', N'local',
+            N'image/jpeg', 245000, 1600, 900, N'VNCultureBridge AI',
+            N'Demo license', 'NHAP', @ContentAdminId
+        );
+    END;
+
+    IF NOT EXISTS (SELECT 1 FROM MEDIA WHERE TenTep = N'tho-cung-to-tien.jpg')
+    BEGIN
+        INSERT INTO MEDIA
+        (
+            LoaiMedia, TenTep, DuongDanTep, NhaCungCapLuuTru, MimeType,
+            KichThuocBytes, RongPx, CaoPx, ChuSoHuuBanQuyen, ThongTinGiayPhep,
+            TrangThai, IDNguoiTaiLen
+        )
+        VALUES
+        (
+            'HINH_ANH', N'tho-cung-to-tien.jpg', N'/media/tho-cung-to-tien.jpg', N'local',
+            N'image/jpeg', 210000, 1400, 900, N'VNCultureBridge AI',
+            N'Demo license', 'NHAP', @ContentAdminId
+        );
+    END;
+
+    IF NOT EXISTS (SELECT 1 FROM MEDIA WHERE TenTep = N'ao-dai-viet-nam.jpg')
+    BEGIN
+        INSERT INTO MEDIA
+        (
+            LoaiMedia, TenTep, DuongDanTep, NhaCungCapLuuTru, MimeType,
+            KichThuocBytes, RongPx, CaoPx, ChuSoHuuBanQuyen, ThongTinGiayPhep,
+            TrangThai, IDNguoiTaiLen
+        )
+        VALUES
+        (
+            'HINH_ANH', N'ao-dai-viet-nam.jpg', N'/media/ao-dai-viet-nam.jpg', N'local',
+            N'image/jpeg', 198000, 1400, 933, N'VNCultureBridge AI',
+            N'Demo license', 'NHAP', @ContentAdminId
+        );
+    END;
+
+    IF NOT EXISTS (SELECT 1 FROM MEDIA WHERE TenTep = N'ca-tru-audio.mp3')
+    BEGIN
+        INSERT INTO MEDIA
+        (
+            LoaiMedia, TenTep, DuongDanTep, NhaCungCapLuuTru, MimeType,
+            KichThuocBytes, ThoiLuongGiay, ChuSoHuuBanQuyen, ThongTinGiayPhep,
+            TrangThai, IDNguoiTaiLen
+        )
+        VALUES
+        (
+            'AM_THANH', N'ca-tru-audio.mp3', N'/media/ca-tru-audio.mp3', N'local',
+            N'audio/mpeg', 3200000, 95, N'VNCultureBridge AI',
+            N'Demo license', 'NHAP', @ContentAdminId
+        );
+    END;
+
+    IF NOT EXISTS (SELECT 1 FROM MEDIA WHERE TenTep = N'nha-rong-tay-nguyen.jpg')
+    BEGIN
+        INSERT INTO MEDIA
+        (
+            LoaiMedia, TenTep, DuongDanTep, NhaCungCapLuuTru, MimeType,
+            KichThuocBytes, RongPx, CaoPx, ChuSoHuuBanQuyen, ThongTinGiayPhep,
+            TrangThai, IDNguoiTaiLen
+        )
+        VALUES
+        (
+            'HINH_ANH', N'nha-rong-tay-nguyen.jpg', N'/media/nha-rong-tay-nguyen.jpg', N'local',
+            N'image/jpeg', 256000, 1500, 1000, N'VNCultureBridge AI',
+            N'Demo license', 'NHAP', @ContentAdminId
+        );
+    END;
+
+    IF NOT EXISTS (SELECT 1 FROM MEDIA WHERE TenTep = N'pho-viet-nam.jpg')
+    BEGIN
+        INSERT INTO MEDIA
+        (
+            LoaiMedia, TenTep, DuongDanTep, NhaCungCapLuuTru, MimeType,
+            KichThuocBytes, RongPx, CaoPx, ChuSoHuuBanQuyen, ThongTinGiayPhep,
+            TrangThai, IDNguoiTaiLen
+        )
+        VALUES
+        (
+            'HINH_ANH', N'pho-viet-nam.jpg', N'/media/pho-viet-nam.jpg', N'local',
+            N'image/jpeg', 230000, 1600, 1066, N'VNCultureBridge AI',
+            N'Demo license', 'NHAP', @ContentAdminId
+        );
+    END;
+
+    IF NOT EXISTS (SELECT 1 FROM MEDIA WHERE TenTep = N'cong-chieng-video.mp4')
+    BEGIN
+        INSERT INTO MEDIA
+        (
+            LoaiMedia, TenTep, DuongDanTep, NhaCungCapLuuTru, MimeType,
+            KichThuocBytes, RongPx, CaoPx, ThoiLuongGiay, ChuSoHuuBanQuyen, ThongTinGiayPhep,
+            TrangThai, IDNguoiTaiLen
+        )
+        VALUES
+        (
+            'VIDEO', N'cong-chieng-video.mp4', N'/media/cong-chieng-video.mp4', N'local',
+            N'video/mp4', 15800000, 1280, 720, 120, N'VNCultureBridge AI',
+            N'Demo license', 'NHAP', @ContentAdminId
+        );
+    END;
+
+    SELECT @MediaTet = IDMedia FROM MEDIA WHERE TenTep = N'tet-nguyen-dan.jpg';
+    SELECT @MediaThoCung = IDMedia FROM MEDIA WHERE TenTep = N'tho-cung-to-tien.jpg';
+    SELECT @MediaAoDai = IDMedia FROM MEDIA WHERE TenTep = N'ao-dai-viet-nam.jpg';
+    SELECT @MediaCaTru = IDMedia FROM MEDIA WHERE TenTep = N'ca-tru-audio.mp3';
+    SELECT @MediaNhaRong = IDMedia FROM MEDIA WHERE TenTep = N'nha-rong-tay-nguyen.jpg';
+    SELECT @MediaPho = IDMedia FROM MEDIA WHERE TenTep = N'pho-viet-nam.jpg';
+    SELECT @MediaCongChieng = IDMedia FROM MEDIA WHERE TenTep = N'cong-chieng-video.mp4';
+
+    INSERT INTO MEDIA_BAN_DICH (IDMedia, MaNgonNgu, VanBanThayThe, ChuThich)
+    SELECT @MediaTet, 'vi', N'Ảnh minh hoạ Tết Nguyên Đán', N'Không khí sum họp dịp đầu năm'
+    WHERE NOT EXISTS (SELECT 1 FROM MEDIA_BAN_DICH WHERE IDMedia = @MediaTet AND MaNgonNgu = 'vi');
+
+    INSERT INTO MEDIA_BAN_DICH (IDMedia, MaNgonNgu, VanBanThayThe, ChuThich)
+    SELECT @MediaTet, 'en', N'Tet holiday illustration', N'Family reunion during the new lunar year'
+    WHERE NOT EXISTS (SELECT 1 FROM MEDIA_BAN_DICH WHERE IDMedia = @MediaTet AND MaNgonNgu = 'en');
+
+    INSERT INTO MEDIA_BAN_DICH (IDMedia, MaNgonNgu, VanBanThayThe, ChuThich)
+    SELECT @MediaThoCung, 'vi', N'Bàn thờ gia tiên trong gia đình Việt', N'Không gian thờ cúng tổ tiên'
+    WHERE NOT EXISTS (SELECT 1 FROM MEDIA_BAN_DICH WHERE IDMedia = @MediaThoCung AND MaNgonNgu = 'vi');
+
+    INSERT INTO MEDIA_BAN_DICH (IDMedia, MaNgonNgu, VanBanThayThe, ChuThich)
+    SELECT @MediaThoCung, 'en', N'An ancestral altar in a Vietnamese home', N'Ancestor worship space'
+    WHERE NOT EXISTS (SELECT 1 FROM MEDIA_BAN_DICH WHERE IDMedia = @MediaThoCung AND MaNgonNgu = 'en');
+
+    INSERT INTO MEDIA_BAN_DICH (IDMedia, MaNgonNgu, VanBanThayThe, ChuThich)
+    SELECT @MediaAoDai, 'vi', N'Người mặc áo dài truyền thống', N'Áo dài trong bối cảnh văn hoá hiện đại'
+    WHERE NOT EXISTS (SELECT 1 FROM MEDIA_BAN_DICH WHERE IDMedia = @MediaAoDai AND MaNgonNgu = 'vi');
+
+    INSERT INTO MEDIA_BAN_DICH (IDMedia, MaNgonNgu, VanBanThayThe, ChuThich)
+    SELECT @MediaAoDai, 'en', N'Vietnamese traditional ao dai costume', N'Ao dai in modern cultural contexts'
+    WHERE NOT EXISTS (SELECT 1 FROM MEDIA_BAN_DICH WHERE IDMedia = @MediaAoDai AND MaNgonNgu = 'en');
+
+    INSERT INTO MEDIA_BAN_DICH (IDMedia, MaNgonNgu, VanBanThayThe, ChuThich)
+    SELECT @MediaCaTru, 'vi', N'Tệp âm thanh minh hoạ ca trù', N'Một đoạn trình diễn ca trù'
+    WHERE NOT EXISTS (SELECT 1 FROM MEDIA_BAN_DICH WHERE IDMedia = @MediaCaTru AND MaNgonNgu = 'vi');
+
+    INSERT INTO MEDIA_BAN_DICH (IDMedia, MaNgonNgu, VanBanThayThe, ChuThich)
+    SELECT @MediaCaTru, 'en', N'Audio sample of ca tru', N'A short ca tru performance clip'
+    WHERE NOT EXISTS (SELECT 1 FROM MEDIA_BAN_DICH WHERE IDMedia = @MediaCaTru AND MaNgonNgu = 'en');
+
+    INSERT INTO MEDIA_BAN_DICH (IDMedia, MaNgonNgu, VanBanThayThe, ChuThich)
+    SELECT @MediaNhaRong, 'vi', N'Hình ảnh nhà rông Tây Nguyên', N'Nhà rông gắn với sinh hoạt cộng đồng'
+    WHERE NOT EXISTS (SELECT 1 FROM MEDIA_BAN_DICH WHERE IDMedia = @MediaNhaRong AND MaNgonNgu = 'vi');
+
+    INSERT INTO MEDIA_BAN_DICH (IDMedia, MaNgonNgu, VanBanThayThe, ChuThich)
+    SELECT @MediaNhaRong, 'en', N'Communal stilt house in the Central Highlands', N'An elevated communal house'
+    WHERE NOT EXISTS (SELECT 1 FROM MEDIA_BAN_DICH WHERE IDMedia = @MediaNhaRong AND MaNgonNgu = 'en');
+
+    INSERT INTO MEDIA_BAN_DICH (IDMedia, MaNgonNgu, VanBanThayThe, ChuThich)
+    SELECT @MediaPho, 'vi', N'Bát phở truyền thống Việt Nam', N'Phở như một biểu tượng ẩm thực'
+    WHERE NOT EXISTS (SELECT 1 FROM MEDIA_BAN_DICH WHERE IDMedia = @MediaPho AND MaNgonNgu = 'vi');
+
+    INSERT INTO MEDIA_BAN_DICH (IDMedia, MaNgonNgu, VanBanThayThe, ChuThich)
+    SELECT @MediaPho, 'en', N'A bowl of traditional Vietnamese pho', N'Pho as a culinary symbol'
+    WHERE NOT EXISTS (SELECT 1 FROM MEDIA_BAN_DICH WHERE IDMedia = @MediaPho AND MaNgonNgu = 'en');
+
+    INSERT INTO MEDIA_BAN_DICH (IDMedia, MaNgonNgu, VanBanThayThe, ChuThich)
+    SELECT @MediaCongChieng, 'vi', N'Video cồng chiêng Tây Nguyên', N'Trình diễn cồng chiêng trong không gian cộng đồng'
+    WHERE NOT EXISTS (SELECT 1 FROM MEDIA_BAN_DICH WHERE IDMedia = @MediaCongChieng AND MaNgonNgu = 'vi');
+
+    INSERT INTO MEDIA_BAN_DICH (IDMedia, MaNgonNgu, VanBanThayThe, ChuThich)
+    SELECT @MediaCongChieng, 'en', N'Central Highlands gong culture video', N'Gong performance in a communal space'
+    WHERE NOT EXISTS (SELECT 1 FROM MEDIA_BAN_DICH WHERE IDMedia = @MediaCongChieng AND MaNgonNgu = 'en');
+
+    /* =========================================================
+       9. BAI VIET
+       ========================================================= */
+
+    /* ---------- Bai 1: Tet ---------- */
+    IF NOT EXISTS (SELECT 1 FROM BAI_VIET WHERE DuongDanSeo = N'tet-nguyen-dan-viet-nam')
+    BEGIN
+        INSERT INTO BAI_VIET
+        (
+            DuongDanSeo, MaNgonNguGoc, LoaiBaiViet, TrangThai,
+            NoiDungNoiBat, CapDoNhayCam, MucDoKiemDuyet,
+            GhiChuBienTap, IDNguoiTao, IDNguoiCapNhat
+        )
+        VALUES
+        (
+            N'tet-nguyen-dan-viet-nam', 'vi', 'LE_HOI', 'NHAP',
+            1, 1, 'THUONG',
+            N'Bài viết nền tảng cho chủ đề Tết', @ContentAdminId, @ContentAdminId
+        );
+    END;
+
+    SELECT @BaiTet = IDBaiViet FROM BAI_VIET WHERE DuongDanSeo = N'tet-nguyen-dan-viet-nam';
+
+    INSERT INTO BAI_VIET_BAN_DICH
+    (
+        IDBaiViet, MaNgonNgu, TieuDe, TomTat, GioiThieu, NguonGoc,
+        YNghiaVanHoa, BoiCanhSuDung, NoiDungChiTiet, GhiChuCultureShock,
+        TieuDeSEO, MoTaSEO, SoPhutDoc, LaBanDichMay,
+        TrangThaiBanDich, IDNguoiSoat, NgaySoat, GhiChuDichGia
+    )
+    SELECT
+        @BaiTet, 'vi',
+        N'Tết Nguyên Đán ở Việt Nam',
+        N'Lễ hội quan trọng nhất trong năm, gắn với sum họp, tưởng nhớ tổ tiên và khởi đầu mới.',
+        N'Tết Nguyên Đán là thời điểm chuyển giao giữa năm cũ và năm mới âm lịch trong văn hoá Việt Nam.',
+        N'Tết phát triển trong bối cảnh văn minh nông nghiệp lúa nước, gắn với chu kỳ mùa vụ và đời sống gia đình.',
+        N'Tết thể hiện tinh thần đoàn tụ, lòng biết ơn với tổ tiên và niềm hy vọng vào một năm mới tốt lành.',
+        N'Tết được thực hành rộng rãi ở nhiều vùng của Việt Nam với những biến thể phong tục địa phương.',
+        N'Trong dịp Tết, người Việt thường dọn dẹp nhà cửa, chuẩn bị mâm cúng, thăm hỏi họ hàng, chúc Tết và sum họp gia đình. Nhiều biểu tượng như bánh chưng, câu đối đỏ, lì xì và mâm ngũ quả đều phản ánh các lớp ý nghĩa văn hoá khác nhau. Tết không chỉ là ngày nghỉ mà còn là dịp tái khẳng định mối liên hệ giữa cá nhân, gia đình và cộng đồng.',
+        N'Nhiều du khách nước ngoài bất ngờ vì cửa hàng đóng cửa trong những ngày đầu năm hoặc vì nghi thức chúc Tết có tính trang trọng.',
+        N'tet-nguyen-dan-viet-nam',
+        N'Giải thích ý nghĩa văn hoá của Tết Nguyên Đán trong đời sống người Việt.',
+        7, 0, 'DA_DUYET', @ReviewerId, SYSUTCDATETIME(), N'Đã soát và chuẩn hoá cách diễn giải.'
+    WHERE NOT EXISTS (
+        SELECT 1 FROM BAI_VIET_BAN_DICH WHERE IDBaiViet = @BaiTet AND MaNgonNgu = 'vi'
+    );
+
+    INSERT INTO BAI_VIET_BAN_DICH
+    (
+        IDBaiViet, MaNgonNgu, TieuDe, TomTat, GioiThieu, NguonGoc,
+        YNghiaVanHoa, BoiCanhSuDung, NoiDungChiTiet, GhiChuCultureShock,
+        TieuDeSEO, MoTaSEO, SoPhutDoc, LaBanDichMay,
+        TrangThaiBanDich, IDNguoiSoat, NgaySoat, GhiChuDichGia
+    )
+    SELECT
+        @BaiTet, 'en',
+        N'Tet Nguyen Dan in Vietnam',
+        N'The most important annual celebration in Vietnam, centered on reunion, remembrance, and renewal.',
+        N'Tet Nguyen Dan marks the transition from the old lunar year to the new one in Vietnamese culture.',
+        N'Its roots are associated with agrarian life, seasonal cycles, and family-centered social structure.',
+        N'Tet reflects family reunion, gratitude toward ancestors, and hopes for prosperity in the new year.',
+        N'It is widely observed across Vietnam, although local customs may vary by region.',
+        N'During Tet, Vietnamese families clean their homes, prepare offerings, visit relatives, exchange greetings, and share festive meals. Symbols such as lucky money, red decorations, and traditional dishes reveal the social and spiritual dimensions of the holiday. Tet is both a celebration and a cultural framework for renewing family and community bonds.',
+        N'Visitors may need context to understand why many services pause and why ritual gestures matter during these days.',
+        N'tet-nguyen-dan-in-vietnam',
+        N'Explore the cultural meaning of Tet Nguyen Dan in Vietnamese life.',
+        7, 0, 'DA_DUYET', @ReviewerId, SYSUTCDATETIME(), N'Human-reviewed bilingual version.'
+    WHERE NOT EXISTS (
+        SELECT 1 FROM BAI_VIET_BAN_DICH WHERE IDBaiViet = @BaiTet AND MaNgonNgu = 'en'
+    );
+
+    /* ---------- Bai 2: Tho cung to tien ---------- */
+    IF NOT EXISTS (SELECT 1 FROM BAI_VIET WHERE DuongDanSeo = N'tho-cung-to-tien-viet-nam')
+    BEGIN
+        INSERT INTO BAI_VIET
+        (
+            DuongDanSeo, MaNgonNguGoc, LoaiBaiViet, TrangThai,
+            NoiDungNoiBat, CapDoNhayCam, MucDoKiemDuyet,
+            GhiChuBienTap, IDNguoiTao, IDNguoiCapNhat
+        )
+        VALUES
+        (
+            N'tho-cung-to-tien-viet-nam', 'vi', 'TIN_NGUONG', 'NHAP',
+            1, 2, 'THUONG',
+            N'Bài viết giải thích tín ngưỡng phổ biến trong gia đình Việt', @ContentAdminId, @ContentAdminId
+        );
+    END;
+
+    SELECT @BaiThoCung = IDBaiViet FROM BAI_VIET WHERE DuongDanSeo = N'tho-cung-to-tien-viet-nam';
+
+    INSERT INTO BAI_VIET_BAN_DICH
+    (
+        IDBaiViet, MaNgonNgu, TieuDe, TomTat, GioiThieu, NguonGoc,
+        YNghiaVanHoa, BoiCanhSuDung, NoiDungChiTiet, GhiChuCultureShock,
+        TieuDeSEO, MoTaSEO, SoPhutDoc, LaBanDichMay,
+        TrangThaiBanDich, IDNguoiSoat, NgaySoat
+    )
+    SELECT
+        @BaiThoCung, 'vi',
+        N'Tục thờ cúng tổ tiên trong văn hoá Việt',
+        N'Một thực hành tín ngưỡng gắn với đạo hiếu, ký ức gia đình và sự tiếp nối giữa các thế hệ.',
+        N'Thờ cúng tổ tiên là nét phổ biến trong đời sống tinh thần của nhiều gia đình Việt Nam.',
+        N'Tục này hình thành từ niềm tin rằng người đã khuất vẫn hiện diện về mặt tinh thần trong gia đình và cộng đồng.',
+        N'Nó thể hiện lòng biết ơn, đạo hiếu và trách nhiệm gìn giữ mối liên kết gia đình qua thời gian.',
+        N'Thực hành này thường xuất hiện vào ngày giỗ, Tết, dịp cưới hỏi, khai trương hoặc những thời điểm quan trọng của gia đình.',
+        N'Trong nhiều gia đình Việt, bàn thờ gia tiên là không gian linh thiêng đặt ở vị trí trang trọng. Nghi thức dâng hương, dâng lễ và tưởng niệm không chỉ mang ý nghĩa tâm linh mà còn là một cách giáo dục con cháu về cội nguồn. Việc thờ cúng tổ tiên vì thế vừa là sinh hoạt tín ngưỡng vừa là hình thức duy trì ký ức văn hoá gia đình.',
+        N'Người nước ngoài có thể hiểu nhầm đây chỉ là nghi thức tôn giáo, trong khi với nhiều gia đình Việt nó còn là thực hành văn hoá và đạo đức.',
+        N'tho-cung-to-tien-viet-nam',
+        N'Giải thích tín ngưỡng thờ cúng tổ tiên trong bối cảnh gia đình Việt Nam.',
+        6, 0, 'DA_DUYET', @ReviewerId, SYSUTCDATETIME()
+    WHERE NOT EXISTS (
+        SELECT 1 FROM BAI_VIET_BAN_DICH WHERE IDBaiViet = @BaiThoCung AND MaNgonNgu = 'vi'
+    );
+
+    INSERT INTO BAI_VIET_BAN_DICH
+    (
+        IDBaiViet, MaNgonNgu, TieuDe, TomTat, GioiThieu, NguonGoc,
+        YNghiaVanHoa, BoiCanhSuDung, NoiDungChiTiet, GhiChuCultureShock,
+        TieuDeSEO, MoTaSEO, SoPhutDoc, LaBanDichMay,
+        TrangThaiBanDich, IDNguoiSoat, NgaySoat
+    )
+    SELECT
+        @BaiThoCung, 'en',
+        N'Ancestor worship in Vietnamese culture',
+        N'A common cultural practice associated with filial piety, memory, and family continuity.',
+        N'Ancestor worship is an important spiritual and cultural practice in many Vietnamese families.',
+        N'It is rooted in the belief that the deceased remain spiritually connected to the living.',
+        N'It expresses gratitude, filial piety, and continuity between generations.',
+        N'It is often observed during death anniversaries, Tet, household ceremonies, and major family milestones.',
+        N'In many homes, the ancestral altar functions as a sacred family space. Offering incense and food is not only a ritual act but also a way of remembering lineage and affirming moral responsibility toward previous generations. This practice therefore combines spirituality, family memory, and cultural identity.',
+        N'Foreign readers may need clarification that this practice is often cultural and familial, not merely doctrinal.',
+        N'ancestor-worship-in-vietnamese-culture',
+        N'Understand the cultural meaning of ancestor worship in Vietnam.',
+        6, 0, 'DA_DUYET', @ReviewerId, SYSUTCDATETIME()
+    WHERE NOT EXISTS (
+        SELECT 1 FROM BAI_VIET_BAN_DICH WHERE IDBaiViet = @BaiThoCung AND MaNgonNgu = 'en'
+    );
+
+    /* ---------- Bai 3: Ao dai ---------- */
+    IF NOT EXISTS (SELECT 1 FROM BAI_VIET WHERE DuongDanSeo = N'ao-dai-viet-nam')
+    BEGIN
+        INSERT INTO BAI_VIET
+        (
+            DuongDanSeo, MaNgonNguGoc, LoaiBaiViet, TrangThai,
+            NoiDungNoiBat, CapDoNhayCam, MucDoKiemDuyet,
+            GhiChuBienTap, IDNguoiTao, IDNguoiCapNhat
+        )
+        VALUES
+        (
+            N'ao-dai-viet-nam', 'vi', 'TRANG_PHUC', 'NHAP',
+            1, 1, 'THUONG',
+            N'Bài viết biểu tượng văn hoá về áo dài', @ContentAdminId, @ContentAdminId
+        );
+    END;
+
+    SELECT @BaiAoDai = IDBaiViet FROM BAI_VIET WHERE DuongDanSeo = N'ao-dai-viet-nam';
+
+    INSERT INTO BAI_VIET_BAN_DICH
+    (
+        IDBaiViet, MaNgonNgu, TieuDe, TomTat, GioiThieu, NguonGoc,
+        YNghiaVanHoa, BoiCanhSuDung, NoiDungChiTiet, GhiChuCultureShock,
+        TieuDeSEO, MoTaSEO, SoPhutDoc, LaBanDichMay,
+        TrangThaiBanDich, IDNguoiSoat, NgaySoat
+    )
+    SELECT
+        @BaiAoDai, 'vi',
+        N'Áo dài trong văn hoá Việt Nam',
+        N'Trang phục biểu tượng vừa truyền thống vừa hiện đại của người Việt.',
+        N'Áo dài là một trong những hình ảnh nhận diện nổi bật nhất của văn hoá Việt Nam.',
+        N'Hình thức áo dài hiện nay là kết quả của quá trình biến đổi lịch sử và thẩm mỹ qua nhiều giai đoạn.',
+        N'Áo dài thường được xem là biểu tượng của sự thanh lịch, duyên dáng và bản sắc văn hoá Việt.',
+        N'Áo dài xuất hiện trong trường học, lễ hội, cưới hỏi, ngoại giao văn hoá và nhiều sự kiện trang trọng.',
+        N'Dù có nhiều biến thể thiết kế, áo dài vẫn giữ một vị trí đặc biệt trong tưởng tượng văn hoá về Việt Nam. Việc mặc áo dài không chỉ là lựa chọn thẩm mỹ mà còn có thể là hành vi biểu đạt danh tính, sự trân trọng truyền thống và ý thức đại diện cho văn hoá dân tộc trong bối cảnh hiện đại.',
+        N'Người nước ngoài dễ nghĩ áo dài chỉ là “quốc phục nữ”, nhưng trên thực tế áo dài có nhiều biến thể, nhiều ngữ cảnh sử dụng và cả phiên bản nam.',
+        N'ao-dai-viet-nam',
+        N'Khám phá ý nghĩa văn hoá của áo dài Việt Nam.',
+        5, 0, 'DA_DUYET', @ReviewerId, SYSUTCDATETIME()
+    WHERE NOT EXISTS (
+        SELECT 1 FROM BAI_VIET_BAN_DICH WHERE IDBaiViet = @BaiAoDai AND MaNgonNgu = 'vi'
+    );
+
+    INSERT INTO BAI_VIET_BAN_DICH
+    (
+        IDBaiViet, MaNgonNgu, TieuDe, TomTat, GioiThieu, NguonGoc,
+        YNghiaVanHoa, BoiCanhSuDung, NoiDungChiTiet, GhiChuCultureShock,
+        TieuDeSEO, MoTaSEO, SoPhutDoc, LaBanDichMay,
+        TrangThaiBanDich, IDNguoiSoat, NgaySoat
+    )
+    SELECT
+        @BaiAoDai, 'en',
+        N'Ao dai in Vietnamese culture',
+        N'A cultural symbol that combines elegance, continuity, and modern identity.',
+        N'The ao dai is one of the most recognizable visual symbols of Vietnam.',
+        N'Its current form is the result of historical transformations in design and social meaning.',
+        N'It is often associated with elegance, grace, and cultural representation.',
+        N'Ao dai is worn in schools, festivals, weddings, diplomatic events, and cultural performances.',
+        N'Although designs continue to evolve, the ao dai remains deeply connected to ideas of Vietnamese identity. Wearing it may express respect for tradition, participation in ceremonial life, or the desire to present a culturally meaningful image in contemporary settings.',
+        N'International audiences may assume it is only a women’s costume, but the history and practice of ao dai are more diverse.',
+        N'ao-dai-in-vietnamese-culture',
+        N'Learn why the ao dai is a major symbol of Vietnamese culture.',
+        5, 0, 'DA_DUYET', @ReviewerId, SYSUTCDATETIME()
+    WHERE NOT EXISTS (
+        SELECT 1 FROM BAI_VIET_BAN_DICH WHERE IDBaiViet = @BaiAoDai AND MaNgonNgu = 'en'
+    );
+
+    /* ---------- Bai 4: Ca tru ---------- */
+    IF NOT EXISTS (SELECT 1 FROM BAI_VIET WHERE DuongDanSeo = N'ca-tru-viet-nam')
+    BEGIN
+        INSERT INTO BAI_VIET
+        (
+            DuongDanSeo, MaNgonNguGoc, LoaiBaiViet, TrangThai,
+            NoiDungNoiBat, CapDoNhayCam, MucDoKiemDuyet,
+            GhiChuBienTap, IDNguoiTao, IDNguoiCapNhat
+        )
+        VALUES
+        (
+            N'ca-tru-viet-nam', 'vi', 'NGHE_THUAT_DAN_GIAN', 'NHAP',
+            0, 1, 'THUONG',
+            N'Bài viết giới thiệu ca trù và bối cảnh biểu diễn', @ContentAdminId, @ContentAdminId
+        );
+    END;
+
+    SELECT @BaiCaTru = IDBaiViet FROM BAI_VIET WHERE DuongDanSeo = N'ca-tru-viet-nam';
+
+    INSERT INTO BAI_VIET_BAN_DICH
+    (
+        IDBaiViet, MaNgonNgu, TieuDe, TomTat, GioiThieu, NguonGoc,
+        YNghiaVanHoa, BoiCanhSuDung, NoiDungChiTiet, GhiChuCultureShock,
+        TieuDeSEO, MoTaSEO, SoPhutDoc, LaBanDichMay,
+        TrangThaiBanDich, IDNguoiSoat, NgaySoat
+    )
+    SELECT
+        @BaiCaTru, 'vi',
+        N'Ca trù trong đời sống nghệ thuật dân gian Việt Nam',
+        N'Một loại hình diễn xướng giàu tính thẩm mỹ và chiều sâu ngữ nghĩa ở miền Bắc Việt Nam.',
+        N'Ca trù là loại hình biểu diễn kết hợp giữa thơ ca, giọng hát và nhạc cụ gõ dây đặc trưng.',
+        N'Nó gắn với không gian thưởng thức mang tính chọn lọc và truyền thống lâu đời.',
+        N'Ca trù thể hiện sự tinh tế trong cảm thụ nghệ thuật, ngôn ngữ và nhịp điệu.',
+        N'Ca trù xuất hiện trong các không gian hát thờ, hát chơi và nhiều bối cảnh trình diễn truyền thống.',
+        N'Điểm đặc biệt của ca trù không chỉ nằm ở giai điệu mà còn ở mối quan hệ giữa lời thơ, nhịp phách, tiếng đàn và cách thưởng thức. Người nghe thường cần một mức độ tập trung cao hơn để cảm nhận vẻ đẹp tiết chế, tao nhã và giàu tính ước lệ của loại hình này.',
+        N'Người nghe quốc tế có thể thấy ca trù “khó tiếp cận” nếu thiếu giải thích về cấu trúc và cách nghe.',
+        N'ca-tru-viet-nam',
+        N'Giới thiệu ca trù như một loại hình nghệ thuật dân gian giàu chiều sâu.',
+        6, 0, 'DA_DUYET', @ReviewerId, SYSUTCDATETIME()
+    WHERE NOT EXISTS (
+        SELECT 1 FROM BAI_VIET_BAN_DICH WHERE IDBaiViet = @BaiCaTru AND MaNgonNgu = 'vi'
+    );
+
+    INSERT INTO BAI_VIET_BAN_DICH
+    (
+        IDBaiViet, MaNgonNgu, TieuDe, TomTat, GioiThieu, NguonGoc,
+        YNghiaVanHoa, BoiCanhSuDung, NoiDungChiTiet, GhiChuCultureShock,
+        TieuDeSEO, MoTaSEO, SoPhutDoc, LaBanDichMay,
+        TrangThaiBanDich, IDNguoiSoat, NgaySoat
+    )
+    SELECT
+        @BaiCaTru, 'en',
+        N'Ca tru in Vietnamese folk performance culture',
+        N'A refined form of Northern Vietnamese performance art built on poetry, voice, and rhythm.',
+        N'Ca tru is a performance genre that combines sung poetry, percussion patterns, and instrumental accompaniment.',
+        N'It is associated with selective listening spaces and a long historical tradition.',
+        N'Ca tru reveals a sophisticated relationship between language, rhythm, and aesthetic restraint.',
+        N'It has been practiced in ritual, literary, and intimate performance contexts.',
+        N'The richness of ca tru lies not only in melody but also in the interaction between poetic text, vocal delivery, instrumental texture, and listening etiquette. Many first-time listeners need cultural guidance to appreciate its subtle structure and emotional discipline.',
+        N'Without explanation, international listeners may underestimate the genre because it does not follow familiar pop or theatrical patterns.',
+        N'ca-tru-in-vietnamese-culture',
+        N'Understand ca tru as a refined Vietnamese performance tradition.',
+        6, 0, 'DA_DUYET', @ReviewerId, SYSUTCDATETIME()
+    WHERE NOT EXISTS (
+        SELECT 1 FROM BAI_VIET_BAN_DICH WHERE IDBaiViet = @BaiCaTru AND MaNgonNgu = 'en'
+    );
+
+    /* ---------- Bai 5: Nha rong ---------- */
+    IF NOT EXISTS (SELECT 1 FROM BAI_VIET WHERE DuongDanSeo = N'nha-rong-tay-nguyen')
+    BEGIN
+        INSERT INTO BAI_VIET
+        (
+            DuongDanSeo, MaNgonNguGoc, LoaiBaiViet, TrangThai,
+            NoiDungNoiBat, CapDoNhayCam, MucDoKiemDuyet,
+            GhiChuBienTap, IDNguoiTao, IDNguoiCapNhat
+        )
+        VALUES
+        (
+            N'nha-rong-tay-nguyen', 'vi', 'KIEN_TRUC', 'NHAP',
+            0, 2, 'THUONG',
+            N'Bài viết giới thiệu kiến trúc và chức năng cộng đồng của nhà rông', @ContentAdminId, @ContentAdminId
+        );
+    END;
+
+    SELECT @BaiNhaRong = IDBaiViet FROM BAI_VIET WHERE DuongDanSeo = N'nha-rong-tay-nguyen';
+
+    INSERT INTO BAI_VIET_BAN_DICH
+    (
+        IDBaiViet, MaNgonNgu, TieuDe, TomTat, GioiThieu, NguonGoc,
+        YNghiaVanHoa, BoiCanhSuDung, NoiDungChiTiet, GhiChuCultureShock,
+        TieuDeSEO, MoTaSEO, SoPhutDoc, LaBanDichMay,
+        TrangThaiBanDich, IDNguoiSoat, NgaySoat
+    )
+    SELECT
+        @BaiNhaRong, 'vi',
+        N'Nhà rông trong không gian văn hoá Tây Nguyên',
+        N'Một kiến trúc cộng đồng tiêu biểu phản ánh tổ chức xã hội và đời sống nghi lễ của nhiều dân tộc Tây Nguyên.',
+        N'Nhà rông là công trình kiến trúc cộng đồng nổi bật trong nhiều buôn làng Tây Nguyên.',
+        N'Nó hình thành gắn với cấu trúc buôn làng, đời sống cộng đồng và các sinh hoạt lễ nghi truyền thống.',
+        N'Nhà rông biểu trưng cho tính cộng đồng, quyền uy tập thể và sự gắn kết của buôn làng.',
+        N'Đây là nơi diễn ra hội họp, tiếp khách, tổ chức nghi lễ và lưu giữ nhiều giá trị văn hoá truyền thống.',
+        N'Hình dáng mái cao, không gian mở và vị trí trung tâm khiến nhà rông trở thành điểm nhấn thị giác và biểu tượng xã hội trong làng. Ý nghĩa của nhà rông không chỉ nằm ở mặt kiến trúc mà còn ở vai trò như một trung tâm sinh hoạt chung, nơi các chuẩn mực cộng đồng được duy trì và truyền lại.',
+        N'Du khách không nên xem nhà rông chỉ là “điểm check-in”, vì với cộng đồng bản địa nó gắn với trật tự xã hội và ký ức văn hoá.',
+        N'nha-rong-tay-nguyen',
+        N'Giới thiệu kiến trúc nhà rông và ý nghĩa cộng đồng ở Tây Nguyên.',
+        5, 0, 'DA_DUYET', @ReviewerId, SYSUTCDATETIME()
+    WHERE NOT EXISTS (
+        SELECT 1 FROM BAI_VIET_BAN_DICH WHERE IDBaiViet = @BaiNhaRong AND MaNgonNgu = 'vi'
+    );
+
+    INSERT INTO BAI_VIET_BAN_DICH
+    (
+        IDBaiViet, MaNgonNgu, TieuDe, TomTat, GioiThieu, NguonGoc,
+        YNghiaVanHoa, BoiCanhSuDung, NoiDungChiTiet, GhiChuCultureShock,
+        TieuDeSEO, MoTaSEO, SoPhutDoc, LaBanDichMay,
+        TrangThaiBanDich, IDNguoiSoat, NgaySoat
+    )
+    SELECT
+        @BaiNhaRong, 'en',
+        N'The communal stilt house in the Central Highlands',
+        N'A community structure that reflects social organization and ceremonial life in the Central Highlands.',
+        N'The communal stilt house is a major architectural symbol in many villages of the Central Highlands.',
+        N'It developed in close relation to village structure, ritual life, and collective social practices.',
+        N'It represents community, authority, and shared cultural memory.',
+        N'It functions as a venue for meetings, ceremonies, hospitality, and intergenerational exchange.',
+        N'Its dramatic roofline and central location make it visually distinctive, but its deeper importance lies in its role as a communal institution. It is a place where social norms, rituals, and stories are rehearsed and preserved.',
+        N'International visitors may overlook its social significance if they interpret it only as vernacular architecture.',
+        N'communal-stilt-house-central-highlands',
+        N'Learn the meaning of the communal stilt house in the Central Highlands.',
+        5, 0, 'DA_DUYET', @ReviewerId, SYSUTCDATETIME()
+    WHERE NOT EXISTS (
+        SELECT 1 FROM BAI_VIET_BAN_DICH WHERE IDBaiViet = @BaiNhaRong AND MaNgonNgu = 'en'
+    );
+
+    /* ---------- Bai 6: Pho ---------- */
+    IF NOT EXISTS (SELECT 1 FROM BAI_VIET WHERE DuongDanSeo = N'pho-viet-nam')
+    BEGIN
+        INSERT INTO BAI_VIET
+        (
+            DuongDanSeo, MaNgonNguGoc, LoaiBaiViet, TrangThai,
+            NoiDungNoiBat, CapDoNhayCam, MucDoKiemDuyet,
+            GhiChuBienTap, IDNguoiTao, IDNguoiCapNhat
+        )
+        VALUES
+        (
+            N'pho-viet-nam', 'vi', 'AM_THUC', 'NHAP',
+            1, 1, 'THUONG',
+            N'Bài viết chủ lực về biểu tượng ẩm thực Việt Nam', @ContentAdminId, @ContentAdminId
+        );
+    END;
+
+    SELECT @BaiPho = IDBaiViet FROM BAI_VIET WHERE DuongDanSeo = N'pho-viet-nam';
+
+    INSERT INTO BAI_VIET_BAN_DICH
+    (
+        IDBaiViet, MaNgonNgu, TieuDe, TomTat, GioiThieu, NguonGoc,
+        YNghiaVanHoa, BoiCanhSuDung, NoiDungChiTiet, GhiChuCultureShock,
+        TieuDeSEO, MoTaSEO, SoPhutDoc, LaBanDichMay,
+        TrangThaiBanDich, IDNguoiSoat, NgaySoat
+    )
+    SELECT
+        @BaiPho, 'vi',
+        N'Phở trong văn hoá ẩm thực Việt Nam',
+        N'Một món ăn biểu tượng thể hiện thói quen, khẩu vị và ký ức ẩm thực của người Việt.',
+        N'Phở là một trong những món ăn nổi tiếng nhất của Việt Nam trong và ngoài nước.',
+        N'Phở phát triển trong bối cảnh giao thoa giữa nhiều truyền thống ẩm thực và đời sống đô thị.',
+        N'Phở không chỉ là món ăn mà còn là biểu tượng về sự quen thuộc, tiện lợi và niềm tự hào ẩm thực.',
+        N'Phở được ăn vào nhiều thời điểm trong ngày và có nhiều biến thể vùng miền.',
+        N'Sức sống văn hoá của phở nằm ở chỗ món ăn này vừa phổ biến vừa có khả năng gợi ký ức cá nhân và ký ức tập thể. Từ quán vỉa hè đến nhà hàng quốc tế, phở xuất hiện trong nhiều không gian xã hội khác nhau và thường được xem như một cách “nếm” Việt Nam đối với người nước ngoài.',
+        N'Khách quốc tế thường quen với một kiểu phở nhất định, nhưng trong thực tế gia vị, nước dùng và thói quen ăn phở rất đa dạng.',
+        N'pho-viet-nam',
+        N'Giải thích vì sao phở trở thành biểu tượng ẩm thực Việt Nam.',
+        5, 0, 'DA_DUYET', @ReviewerId, SYSUTCDATETIME()
+    WHERE NOT EXISTS (
+        SELECT 1 FROM BAI_VIET_BAN_DICH WHERE IDBaiViet = @BaiPho AND MaNgonNgu = 'vi'
+    );
+
+    INSERT INTO BAI_VIET_BAN_DICH
+    (
+        IDBaiViet, MaNgonNgu, TieuDe, TomTat, GioiThieu, NguonGoc,
+        YNghiaVanHoa, BoiCanhSuDung, NoiDungChiTiet, GhiChuCultureShock,
+        TieuDeSEO, MoTaSEO, SoPhutDoc, LaBanDichMay,
+        TrangThaiBanDich, IDNguoiSoat, NgaySoat
+    )
+    SELECT
+        @BaiPho, 'en',
+        N'Pho in Vietnamese culinary culture',
+        N'A signature dish that carries everyday familiarity, regional diversity, and culinary identity.',
+        N'Pho is one of the best-known Vietnamese dishes both domestically and internationally.',
+        N'It emerged through culinary exchange, urban life, and evolving taste preferences.',
+        N'Pho represents comfort, accessibility, and national culinary pride.',
+        N'It can be eaten at different times of day and appears in many regional styles.',
+        N'Pho is culturally powerful because it is both ordinary and symbolic. It can evoke home, travel, memory, and social routine all at once. For many international visitors, pho serves as an entry point into Vietnamese food culture, but its local meanings are richer than its global popularity might suggest.',
+        N'Visitors often expect a single standard version of pho, yet broth style, herbs, condiments, and serving habits differ considerably.',
+        N'pho-in-vietnamese-culture',
+        N'Explore pho as a symbol of Vietnamese culinary culture.',
+        5, 0, 'DA_DUYET', @ReviewerId, SYSUTCDATETIME()
+    WHERE NOT EXISTS (
+        SELECT 1 FROM BAI_VIET_BAN_DICH WHERE IDBaiViet = @BaiPho AND MaNgonNgu = 'en'
+    );
+
+    /* ---------- Bai 7: Cong chieng ---------- */
+    IF NOT EXISTS (SELECT 1 FROM BAI_VIET WHERE DuongDanSeo = N'cong-chieng-tay-nguyen')
+    BEGIN
+        INSERT INTO BAI_VIET
+        (
+            DuongDanSeo, MaNgonNguGoc, LoaiBaiViet, TrangThai,
+            NoiDungNoiBat, CapDoNhayCam, MucDoKiemDuyet,
+            GhiChuBienTap, IDNguoiTao, IDNguoiCapNhat
+        )
+        VALUES
+        (
+            N'cong-chieng-tay-nguyen', 'vi', 'NGHE_THUAT_DAN_GIAN', 'NHAP',
+            1, 2, 'THUONG',
+            N'Bài viết giới thiệu không gian văn hoá cồng chiêng', @ContentAdminId, @ContentAdminId
+        );
+    END;
+
+    SELECT @BaiCongChieng = IDBaiViet FROM BAI_VIET WHERE DuongDanSeo = N'cong-chieng-tay-nguyen';
+
+    INSERT INTO BAI_VIET_BAN_DICH
+    (
+        IDBaiViet, MaNgonNgu, TieuDe, TomTat, GioiThieu, NguonGoc,
+        YNghiaVanHoa, BoiCanhSuDung, NoiDungChiTiet, GhiChuCultureShock,
+        TieuDeSEO, MoTaSEO, SoPhutDoc, LaBanDichMay,
+        TrangThaiBanDich, IDNguoiSoat, NgaySoat
+    )
+    SELECT
+        @BaiCongChieng, 'vi',
+        N'Không gian văn hoá cồng chiêng Tây Nguyên',
+        N'Một thực hành âm nhạc - nghi lễ gắn với đời sống cộng đồng và thế giới quan của nhiều dân tộc Tây Nguyên.',
+        N'Cồng chiêng là thành tố quan trọng trong nhiều nghi lễ và sinh hoạt cộng đồng ở Tây Nguyên.',
+        N'Nó gắn với lịch sử làng, chu kỳ đời người, lễ hội nông nghiệp và quan niệm về thế giới linh thiêng.',
+        N'Cồng chiêng thể hiện bản sắc cộng đồng, tinh thần lễ hội và mối liên hệ giữa con người với tự nhiên và thần linh.',
+        N'Cồng chiêng thường xuất hiện trong lễ hội, nghi lễ vòng đời, sinh hoạt cộng đồng và các bối cảnh truyền thống quan trọng.',
+        N'Khái niệm “không gian văn hoá cồng chiêng” nhấn mạnh rằng giá trị của cồng chiêng không nằm ở nhạc cụ đơn lẻ mà ở toàn bộ hệ sinh thái văn hoá bao quanh việc trình diễn: con người, cộng đồng, nghi lễ, địa điểm và ký ức tập thể. Vì vậy, cồng chiêng cần được hiểu như một thực hành sống chứ không chỉ là tiết mục biểu diễn.',
+        N'Nếu chỉ xem cồng chiêng như một show diễn, người xem sẽ bỏ qua ý nghĩa nghi lễ và cộng đồng của nó.',
+        N'cong-chieng-tay-nguyen',
+        N'Giới thiệu ý nghĩa văn hoá của cồng chiêng Tây Nguyên.',
+        6, 0, 'DA_DUYET', @ReviewerId, SYSUTCDATETIME()
+    WHERE NOT EXISTS (
+        SELECT 1 FROM BAI_VIET_BAN_DICH WHERE IDBaiViet = @BaiCongChieng AND MaNgonNgu = 'vi'
+    );
+
+    INSERT INTO BAI_VIET_BAN_DICH
+    (
+        IDBaiViet, MaNgonNgu, TieuDe, TomTat, GioiThieu, NguonGoc,
+        YNghiaVanHoa, BoiCanhSuDung, NoiDungChiTiet, GhiChuCultureShock,
+        TieuDeSEO, MoTaSEO, SoPhutDoc, LaBanDichMay,
+        TrangThaiBanDich, IDNguoiSoat, NgaySoat
+    )
+    SELECT
+        @BaiCongChieng, 'en',
+        N'Gong culture in the Central Highlands',
+        N'A ritual and musical tradition connected to communal life, memory, and cosmology.',
+        N'Gongs are central to many ceremonies and festive contexts in the Central Highlands.',
+        N'The practice is linked to village history, agricultural cycles, life-cycle rituals, and sacred beliefs.',
+        N'Gong culture represents communal identity, ceremonial vitality, and a relationship with the spiritual world.',
+        N'It is performed in festivals, village ceremonies, and other culturally significant events.',
+        N'The phrase “gong culture space” highlights that the value of this tradition lies not merely in the instruments themselves, but in the broader network of people, rituals, places, and meanings that surround performance. To understand it properly, one must see it as a living cultural system.',
+        N'International audiences may reduce it to stage entertainment unless ritual and community context are explained.',
+        N'gong-culture-central-highlands',
+        N'Understand gong culture as a living tradition in the Central Highlands.',
+        6, 0, 'DA_DUYET', @ReviewerId, SYSUTCDATETIME()
+    WHERE NOT EXISTS (
+        SELECT 1 FROM BAI_VIET_BAN_DICH WHERE IDBaiViet = @BaiCongChieng AND MaNgonNgu = 'en'
+    );
+
+    /* =========================================================
+       10. GAN DANH MUC / VUNG / DAN TOC / THE / TU KHOA / NGUON
+       ========================================================= */
+
+    /* Tet */
+    INSERT INTO BAI_VIET_DANH_MUC (IDBaiViet, IDDanhMuc, LaDanhMucChinh)
+    SELECT @BaiTet, d.IDDanhMuc, 1
+    FROM DANH_MUC_CHU_DE d
+    WHERE d.MaDanhMuc = 'LE_HOI'
+      AND NOT EXISTS (SELECT 1 FROM BAI_VIET_DANH_MUC WHERE IDBaiViet = @BaiTet AND IDDanhMuc = d.IDDanhMuc);
+
+    INSERT INTO BAI_VIET_VUNG_VAN_HOA (IDBaiViet, IDVung, LoaiLienHe)
+    SELECT @BaiTet, v.IDVung, 'PHO_BIEN'
+    FROM VUNG_VAN_HOA v
+    WHERE v.MaVung IN ('MIEN_BAC','MIEN_TRUNG','MIEN_NAM')
+      AND NOT EXISTS (SELECT 1 FROM BAI_VIET_VUNG_VAN_HOA x WHERE x.IDBaiViet = @BaiTet AND x.IDVung = v.IDVung);
+
+    INSERT INTO BAI_VIET_THE (IDBaiViet, IDThe)
+    SELECT @BaiTet, t.IDThe
+    FROM THE_NOI_DUNG t
+    WHERE t.MaThe = 'TET'
+      AND NOT EXISTS (SELECT 1 FROM BAI_VIET_THE x WHERE x.IDBaiViet = @BaiTet AND x.IDThe = t.IDThe);
+
+    INSERT INTO BAI_VIET_TU_KHOA (IDBaiViet, IDTuKhoa)
+    SELECT @BaiTet, k.IDTuKhoa
+    FROM TU_KHOA k
+    WHERE k.MaTuKhoa = 'TET_NGUYEN_DAN'
+      AND NOT EXISTS (SELECT 1 FROM BAI_VIET_TU_KHOA x WHERE x.IDBaiViet = @BaiTet AND x.IDTuKhoa = k.IDTuKhoa);
+
+    INSERT INTO BAI_VIET_NGUON_THAM_KHAO (IDBaiViet, IDNguon, GhiChuTrichDan, LaNguonChinh)
+    SELECT @BaiTet, @NguonTet, N'Nguồn chính cho bài viết Tết', 1
+    WHERE NOT EXISTS (SELECT 1 FROM BAI_VIET_NGUON_THAM_KHAO WHERE IDBaiViet = @BaiTet AND IDNguon = @NguonTet);
+
+    /* Tho cung */
+    INSERT INTO BAI_VIET_DANH_MUC (IDBaiViet, IDDanhMuc, LaDanhMucChinh)
+    SELECT @BaiThoCung, d.IDDanhMuc, 1
+    FROM DANH_MUC_CHU_DE d
+    WHERE d.MaDanhMuc = 'TIN_NGUONG'
+      AND NOT EXISTS (SELECT 1 FROM BAI_VIET_DANH_MUC WHERE IDBaiViet = @BaiThoCung AND IDDanhMuc = d.IDDanhMuc);
+
+    INSERT INTO BAI_VIET_VUNG_VAN_HOA (IDBaiViet, IDVung, LoaiLienHe)
+    SELECT @BaiThoCung, v.IDVung, 'PHO_BIEN'
+    FROM VUNG_VAN_HOA v
+    WHERE v.MaVung IN ('MIEN_BAC','MIEN_TRUNG','MIEN_NAM')
+      AND NOT EXISTS (SELECT 1 FROM BAI_VIET_VUNG_VAN_HOA x WHERE x.IDBaiViet = @BaiThoCung AND x.IDVung = v.IDVung);
+
+    INSERT INTO BAI_VIET_DAN_TOC (IDBaiViet, IDDanToc, LoaiLienHe)
+    SELECT @BaiThoCung, d.IDDanToc, 'PHO_BIEN'
+    FROM DAN_TOC d
+    WHERE d.MaDanToc = 'KINH'
+      AND NOT EXISTS (SELECT 1 FROM BAI_VIET_DAN_TOC x WHERE x.IDBaiViet = @BaiThoCung AND x.IDDanToc = d.IDDanToc);
+
+    INSERT INTO BAI_VIET_THE (IDBaiViet, IDThe)
+    SELECT @BaiThoCung, t.IDThe
+    FROM THE_NOI_DUNG t
+    WHERE t.MaThe = 'THO_CUNG_TO_TIEN'
+      AND NOT EXISTS (SELECT 1 FROM BAI_VIET_THE x WHERE x.IDBaiViet = @BaiThoCung AND x.IDThe = t.IDThe);
+
+    INSERT INTO BAI_VIET_TU_KHOA (IDBaiViet, IDTuKhoa)
+    SELECT @BaiThoCung, k.IDTuKhoa
+    FROM TU_KHOA k
+    WHERE k.MaTuKhoa = 'ANCESTOR_WORSHIP'
+      AND NOT EXISTS (SELECT 1 FROM BAI_VIET_TU_KHOA x WHERE x.IDBaiViet = @BaiThoCung AND x.IDTuKhoa = k.IDTuKhoa);
+
+    INSERT INTO BAI_VIET_NGUON_THAM_KHAO (IDBaiViet, IDNguon, GhiChuTrichDan, LaNguonChinh)
+    SELECT @BaiThoCung, @NguonThoCung, N'Nguồn chính cho bài viết thờ cúng tổ tiên', 1
+    WHERE NOT EXISTS (SELECT 1 FROM BAI_VIET_NGUON_THAM_KHAO WHERE IDBaiViet = @BaiThoCung AND IDNguon = @NguonThoCung);
+
+    /* Ao dai */
+    INSERT INTO BAI_VIET_DANH_MUC (IDBaiViet, IDDanhMuc, LaDanhMucChinh)
+    SELECT @BaiAoDai, d.IDDanhMuc, 1
+    FROM DANH_MUC_CHU_DE d
+    WHERE d.MaDanhMuc = 'TRANG_PHUC'
+      AND NOT EXISTS (SELECT 1 FROM BAI_VIET_DANH_MUC WHERE IDBaiViet = @BaiAoDai AND IDDanhMuc = d.IDDanhMuc);
+
+    INSERT INTO BAI_VIET_VUNG_VAN_HOA (IDBaiViet, IDVung, LoaiLienHe)
+    SELECT @BaiAoDai, v.IDVung, 'LIEN_QUAN'
+    FROM VUNG_VAN_HOA v
+    WHERE v.MaVung IN ('MIEN_TRUNG','MIEN_NAM')
+      AND NOT EXISTS (SELECT 1 FROM BAI_VIET_VUNG_VAN_HOA x WHERE x.IDBaiViet = @BaiAoDai AND x.IDVung = v.IDVung);
+
+    INSERT INTO BAI_VIET_THE (IDBaiViet, IDThe)
+    SELECT @BaiAoDai, t.IDThe
+    FROM THE_NOI_DUNG t
+    WHERE t.MaThe = 'AO_DAI'
+      AND NOT EXISTS (SELECT 1 FROM BAI_VIET_THE x WHERE x.IDBaiViet = @BaiAoDai AND x.IDThe = t.IDThe);
+
+    INSERT INTO BAI_VIET_TU_KHOA (IDBaiViet, IDTuKhoa)
+    SELECT @BaiAoDai, k.IDTuKhoa
+    FROM TU_KHOA k
+    WHERE k.MaTuKhoa = 'AO_DAI'
+      AND NOT EXISTS (SELECT 1 FROM BAI_VIET_TU_KHOA x WHERE x.IDBaiViet = @BaiAoDai AND x.IDTuKhoa = k.IDTuKhoa);
+
+    INSERT INTO BAI_VIET_NGUON_THAM_KHAO (IDBaiViet, IDNguon, GhiChuTrichDan, LaNguonChinh)
+    SELECT @BaiAoDai, @NguonAoDai, N'Nguồn chính cho bài viết áo dài', 1
+    WHERE NOT EXISTS (SELECT 1 FROM BAI_VIET_NGUON_THAM_KHAO WHERE IDBaiViet = @BaiAoDai AND IDNguon = @NguonAoDai);
+
+    /* Ca tru */
+    INSERT INTO BAI_VIET_DANH_MUC (IDBaiViet, IDDanhMuc, LaDanhMucChinh)
+    SELECT @BaiCaTru, d.IDDanhMuc, 1
+    FROM DANH_MUC_CHU_DE d
+    WHERE d.MaDanhMuc = 'NGHE_THUAT_DAN_GIAN'
+      AND NOT EXISTS (SELECT 1 FROM BAI_VIET_DANH_MUC WHERE IDBaiViet = @BaiCaTru AND IDDanhMuc = d.IDDanhMuc);
+
+    INSERT INTO BAI_VIET_VUNG_VAN_HOA (IDBaiViet, IDVung, LoaiLienHe)
+    SELECT @BaiCaTru, v.IDVung, 'NGUON_GOC'
+    FROM VUNG_VAN_HOA v
+    WHERE v.MaVung = 'MIEN_BAC'
+      AND NOT EXISTS (SELECT 1 FROM BAI_VIET_VUNG_VAN_HOA x WHERE x.IDBaiViet = @BaiCaTru AND x.IDVung = v.IDVung);
+
+    INSERT INTO BAI_VIET_THE (IDBaiViet, IDThe)
+    SELECT @BaiCaTru, t.IDThe
+    FROM THE_NOI_DUNG t
+    WHERE t.MaThe = 'CA_TRU'
+      AND NOT EXISTS (SELECT 1 FROM BAI_VIET_THE x WHERE x.IDBaiViet = @BaiCaTru AND x.IDThe = t.IDThe);
+
+    INSERT INTO BAI_VIET_TU_KHOA (IDBaiViet, IDTuKhoa)
+    SELECT @BaiCaTru, k.IDTuKhoa
+    FROM TU_KHOA k
+    WHERE k.MaTuKhoa = 'CA_TRU'
+      AND NOT EXISTS (SELECT 1 FROM BAI_VIET_TU_KHOA x WHERE x.IDBaiViet = @BaiCaTru AND x.IDTuKhoa = k.IDTuKhoa);
+
+    INSERT INTO BAI_VIET_NGUON_THAM_KHAO (IDBaiViet, IDNguon, GhiChuTrichDan, LaNguonChinh)
+    SELECT @BaiCaTru, @NguonCaTru, N'Nguồn chính cho bài viết ca trù', 1
+    WHERE NOT EXISTS (SELECT 1 FROM BAI_VIET_NGUON_THAM_KHAO WHERE IDBaiViet = @BaiCaTru AND IDNguon = @NguonCaTru);
+
+    /* Nha rong */
+    INSERT INTO BAI_VIET_DANH_MUC (IDBaiViet, IDDanhMuc, LaDanhMucChinh)
+    SELECT @BaiNhaRong, d.IDDanhMuc, 1
+    FROM DANH_MUC_CHU_DE d
+    WHERE d.MaDanhMuc = 'KIEN_TRUC'
+      AND NOT EXISTS (SELECT 1 FROM BAI_VIET_DANH_MUC WHERE IDBaiViet = @BaiNhaRong AND IDDanhMuc = d.IDDanhMuc);
+
+    INSERT INTO BAI_VIET_VUNG_VAN_HOA (IDBaiViet, IDVung, LoaiLienHe)
+    SELECT @BaiNhaRong, v.IDVung, 'NGUON_GOC'
+    FROM VUNG_VAN_HOA v
+    WHERE v.MaVung = 'TAY_NGUYEN'
+      AND NOT EXISTS (SELECT 1 FROM BAI_VIET_VUNG_VAN_HOA x WHERE x.IDBaiViet = @BaiNhaRong AND x.IDVung = v.IDVung);
+
+    INSERT INTO BAI_VIET_DAN_TOC (IDBaiViet, IDDanToc, LoaiLienHe)
+    SELECT @BaiNhaRong, d.IDDanToc, 'LIEN_QUAN'
+    FROM DAN_TOC d
+    WHERE d.MaDanToc = 'EDE'
+      AND NOT EXISTS (SELECT 1 FROM BAI_VIET_DAN_TOC x WHERE x.IDBaiViet = @BaiNhaRong AND x.IDDanToc = d.IDDanToc);
+
+    INSERT INTO BAI_VIET_THE (IDBaiViet, IDThe)
+    SELECT @BaiNhaRong, t.IDThe
+    FROM THE_NOI_DUNG t
+    WHERE t.MaThe = 'NHA_RONG'
+      AND NOT EXISTS (SELECT 1 FROM BAI_VIET_THE x WHERE x.IDBaiViet = @BaiNhaRong AND x.IDThe = t.IDThe);
+
+    INSERT INTO BAI_VIET_TU_KHOA (IDBaiViet, IDTuKhoa)
+    SELECT @BaiNhaRong, k.IDTuKhoa
+    FROM TU_KHOA k
+    WHERE k.MaTuKhoa = 'NHA_RONG'
+      AND NOT EXISTS (SELECT 1 FROM BAI_VIET_TU_KHOA x WHERE x.IDBaiViet = @BaiNhaRong AND x.IDTuKhoa = k.IDTuKhoa);
+
+    INSERT INTO BAI_VIET_NGUON_THAM_KHAO (IDBaiViet, IDNguon, GhiChuTrichDan, LaNguonChinh)
+    SELECT @BaiNhaRong, @NguonNhaRong, N'Nguồn chính cho bài viết nhà rông', 1
+    WHERE NOT EXISTS (SELECT 1 FROM BAI_VIET_NGUON_THAM_KHAO WHERE IDBaiViet = @BaiNhaRong AND IDNguon = @NguonNhaRong);
+
+    /* Pho */
+    INSERT INTO BAI_VIET_DANH_MUC (IDBaiViet, IDDanhMuc, LaDanhMucChinh)
+    SELECT @BaiPho, d.IDDanhMuc, 1
+    FROM DANH_MUC_CHU_DE d
+    WHERE d.MaDanhMuc = 'AM_THUC'
+      AND NOT EXISTS (SELECT 1 FROM BAI_VIET_DANH_MUC WHERE IDBaiViet = @BaiPho AND IDDanhMuc = d.IDDanhMuc);
+
+    INSERT INTO BAI_VIET_VUNG_VAN_HOA (IDBaiViet, IDVung, LoaiLienHe)
+    SELECT @BaiPho, v.IDVung, 'PHO_BIEN'
+    FROM VUNG_VAN_HOA v
+    WHERE v.MaVung IN ('MIEN_BAC','MIEN_NAM')
+      AND NOT EXISTS (SELECT 1 FROM BAI_VIET_VUNG_VAN_HOA x WHERE x.IDBaiViet = @BaiPho AND x.IDVung = v.IDVung);
+
+    INSERT INTO BAI_VIET_DAN_TOC (IDBaiViet, IDDanToc, LoaiLienHe)
+    SELECT @BaiPho, d.IDDanToc, 'PHO_BIEN'
+    FROM DAN_TOC d
+    WHERE d.MaDanToc = 'KINH'
+      AND NOT EXISTS (SELECT 1 FROM BAI_VIET_DAN_TOC x WHERE x.IDBaiViet = @BaiPho AND x.IDDanToc = d.IDDanToc);
+
+    INSERT INTO BAI_VIET_THE (IDBaiViet, IDThe)
+    SELECT @BaiPho, t.IDThe
+    FROM THE_NOI_DUNG t
+    WHERE t.MaThe = 'PHO'
+      AND NOT EXISTS (SELECT 1 FROM BAI_VIET_THE x WHERE x.IDBaiViet = @BaiPho AND x.IDThe = t.IDThe);
+
+    INSERT INTO BAI_VIET_TU_KHOA (IDBaiViet, IDTuKhoa)
+    SELECT @BaiPho, k.IDTuKhoa
+    FROM TU_KHOA k
+    WHERE k.MaTuKhoa = 'PHO_BO'
+      AND NOT EXISTS (SELECT 1 FROM BAI_VIET_TU_KHOA x WHERE x.IDBaiViet = @BaiPho AND x.IDTuKhoa = k.IDTuKhoa);
+
+    INSERT INTO BAI_VIET_NGUON_THAM_KHAO (IDBaiViet, IDNguon, GhiChuTrichDan, LaNguonChinh)
+    SELECT @BaiPho, @NguonPho, N'Nguồn chính cho bài viết phở', 1
+    WHERE NOT EXISTS (SELECT 1 FROM BAI_VIET_NGUON_THAM_KHAO WHERE IDBaiViet = @BaiPho AND IDNguon = @NguonPho);
+
+    /* Cong chieng */
+    INSERT INTO BAI_VIET_DANH_MUC (IDBaiViet, IDDanhMuc, LaDanhMucChinh)
+    SELECT @BaiCongChieng, d.IDDanhMuc, 1
+    FROM DANH_MUC_CHU_DE d
+    WHERE d.MaDanhMuc = 'NGHE_THUAT_DAN_GIAN'
+      AND NOT EXISTS (SELECT 1 FROM BAI_VIET_DANH_MUC WHERE IDBaiViet = @BaiCongChieng AND IDDanhMuc = d.IDDanhMuc);
+
+    INSERT INTO BAI_VIET_VUNG_VAN_HOA (IDBaiViet, IDVung, LoaiLienHe)
+    SELECT @BaiCongChieng, v.IDVung, 'NGUON_GOC'
+    FROM VUNG_VAN_HOA v
+    WHERE v.MaVung = 'TAY_NGUYEN'
+      AND NOT EXISTS (SELECT 1 FROM BAI_VIET_VUNG_VAN_HOA x WHERE x.IDBaiViet = @BaiCongChieng AND x.IDVung = v.IDVung);
+
+    INSERT INTO BAI_VIET_DAN_TOC (IDBaiViet, IDDanToc, LoaiLienHe)
+    SELECT @BaiCongChieng, d.IDDanToc, 'LIEN_QUAN'
+    FROM DAN_TOC d
+    WHERE d.MaDanToc IN ('EDE','HMONG')
+      AND NOT EXISTS (SELECT 1 FROM BAI_VIET_DAN_TOC x WHERE x.IDBaiViet = @BaiCongChieng AND x.IDDanToc = d.IDDanToc);
+
+    INSERT INTO BAI_VIET_THE (IDBaiViet, IDThe)
+    SELECT @BaiCongChieng, t.IDThe
+    FROM THE_NOI_DUNG t
+    WHERE t.MaThe = 'CONG_CHIENG'
+      AND NOT EXISTS (SELECT 1 FROM BAI_VIET_THE x WHERE x.IDBaiViet = @BaiCongChieng AND x.IDThe = t.IDThe);
+
+    INSERT INTO BAI_VIET_TU_KHOA (IDBaiViet, IDTuKhoa)
+    SELECT @BaiCongChieng, k.IDTuKhoa
+    FROM TU_KHOA k
+    WHERE k.MaTuKhoa = 'CONG_CHIENG_TAY_NGUYEN'
+      AND NOT EXISTS (SELECT 1 FROM BAI_VIET_TU_KHOA x WHERE x.IDBaiViet = @BaiCongChieng AND x.IDTuKhoa = k.IDTuKhoa);
+
+    INSERT INTO BAI_VIET_NGUON_THAM_KHAO (IDBaiViet, IDNguon, GhiChuTrichDan, LaNguonChinh)
+    SELECT @BaiCongChieng, @NguonCongChieng, N'Nguồn chính cho bài viết cồng chiêng', 1
+    WHERE NOT EXISTS (SELECT 1 FROM BAI_VIET_NGUON_THAM_KHAO WHERE IDBaiViet = @BaiCongChieng AND IDNguon = @NguonCongChieng);
+
+    /* =========================================================
+       11. GAN MEDIA CHO BAI VIET + MEDIA THEO VUNG/DAN TOC
+       ========================================================= */
+    INSERT INTO BAI_VIET_MEDIA (IDBaiViet, IDMedia, ThuTuHienThi, LaMediaChinh, NguCanhSuDung)
+    SELECT @BaiTet, @MediaTet, 1, 1, 'ANH_BIA'
+    WHERE NOT EXISTS (SELECT 1 FROM BAI_VIET_MEDIA WHERE IDBaiViet = @BaiTet AND IDMedia = @MediaTet);
+
+    INSERT INTO BAI_VIET_MEDIA (IDBaiViet, IDMedia, ThuTuHienThi, LaMediaChinh, NguCanhSuDung)
+    SELECT @BaiThoCung, @MediaThoCung, 1, 1, 'ANH_BIA'
+    WHERE NOT EXISTS (SELECT 1 FROM BAI_VIET_MEDIA WHERE IDBaiViet = @BaiThoCung AND IDMedia = @MediaThoCung);
+
+    INSERT INTO BAI_VIET_MEDIA (IDBaiViet, IDMedia, ThuTuHienThi, LaMediaChinh, NguCanhSuDung)
+    SELECT @BaiAoDai, @MediaAoDai, 1, 1, 'ANH_BIA'
+    WHERE NOT EXISTS (SELECT 1 FROM BAI_VIET_MEDIA WHERE IDBaiViet = @BaiAoDai AND IDMedia = @MediaAoDai);
+
+    INSERT INTO BAI_VIET_MEDIA (IDBaiViet, IDMedia, ThuTuHienThi, LaMediaChinh, NguCanhSuDung)
+    SELECT @BaiCaTru, @MediaCaTru, 1, 1, 'THAM_KHAO'
+    WHERE NOT EXISTS (SELECT 1 FROM BAI_VIET_MEDIA WHERE IDBaiViet = @BaiCaTru AND IDMedia = @MediaCaTru);
+
+    INSERT INTO BAI_VIET_MEDIA (IDBaiViet, IDMedia, ThuTuHienThi, LaMediaChinh, NguCanhSuDung)
+    SELECT @BaiNhaRong, @MediaNhaRong, 1, 1, 'ANH_BIA'
+    WHERE NOT EXISTS (SELECT 1 FROM BAI_VIET_MEDIA WHERE IDBaiViet = @BaiNhaRong AND IDMedia = @MediaNhaRong);
+
+    INSERT INTO BAI_VIET_MEDIA (IDBaiViet, IDMedia, ThuTuHienThi, LaMediaChinh, NguCanhSuDung)
+    SELECT @BaiPho, @MediaPho, 1, 1, 'ANH_BIA'
+    WHERE NOT EXISTS (SELECT 1 FROM BAI_VIET_MEDIA WHERE IDBaiViet = @BaiPho AND IDMedia = @MediaPho);
+
+    INSERT INTO BAI_VIET_MEDIA (IDBaiViet, IDMedia, ThuTuHienThi, LaMediaChinh, NguCanhSuDung)
+    SELECT @BaiCongChieng, @MediaCongChieng, 1, 1, 'THAM_KHAO'
+    WHERE NOT EXISTS (SELECT 1 FROM BAI_VIET_MEDIA WHERE IDBaiViet = @BaiCongChieng AND IDMedia = @MediaCongChieng);
+
+    INSERT INTO MEDIA_VUNG_VAN_HOA (IDMedia, IDVung, ThuTuHienThi)
+    SELECT @MediaNhaRong, v.IDVung, 1
+    FROM VUNG_VAN_HOA v
+    WHERE v.MaVung = 'TAY_NGUYEN'
+      AND NOT EXISTS (SELECT 1 FROM MEDIA_VUNG_VAN_HOA WHERE IDMedia = @MediaNhaRong AND IDVung = v.IDVung);
+
+    INSERT INTO MEDIA_VUNG_VAN_HOA (IDMedia, IDVung, ThuTuHienThi)
+    SELECT @MediaCongChieng, v.IDVung, 1
+    FROM VUNG_VAN_HOA v
+    WHERE v.MaVung = 'TAY_NGUYEN'
+      AND NOT EXISTS (SELECT 1 FROM MEDIA_VUNG_VAN_HOA WHERE IDMedia = @MediaCongChieng AND IDVung = v.IDVung);
+
+    INSERT INTO MEDIA_DAN_TOC (IDMedia, IDDanToc, ThuTuHienThi)
+    SELECT @MediaNhaRong, d.IDDanToc, 1
+    FROM DAN_TOC d
+    WHERE d.MaDanToc = 'EDE'
+      AND NOT EXISTS (SELECT 1 FROM MEDIA_DAN_TOC WHERE IDMedia = @MediaNhaRong AND IDDanToc = d.IDDanToc);
+
+    INSERT INTO MEDIA_DAN_TOC (IDMedia, IDDanToc, ThuTuHienThi)
+    SELECT @MediaCongChieng, d.IDDanToc, 1
+    FROM DAN_TOC d
+    WHERE d.MaDanToc = 'EDE'
+      AND NOT EXISTS (SELECT 1 FROM MEDIA_DAN_TOC WHERE IDMedia = @MediaCongChieng AND IDDanToc = d.IDDanToc);
+
+    UPDATE MEDIA SET TrangThai = 'HOAT_DONG' WHERE IDMedia IN (@MediaTet,@MediaThoCung,@MediaAoDai,@MediaCaTru,@MediaNhaRong,@MediaPho,@MediaCongChieng);
+
+    /* =========================================================
+       12. BAI VIET LIEN QUAN
+       ========================================================= */
+    INSERT INTO BAI_VIET_LIEN_QUAN (IDBaiViet, IDBaiVietLienQuan, LoaiLienKet, TrongSo)
+    SELECT @BaiTet, @BaiThoCung, 'GOI_Y', 1.70
+    WHERE NOT EXISTS (
+        SELECT 1 FROM BAI_VIET_LIEN_QUAN
+        WHERE IDBaiViet = @BaiTet AND IDBaiVietLienQuan = @BaiThoCung AND LoaiLienKet = 'GOI_Y'
+    );
+
+    INSERT INTO BAI_VIET_LIEN_QUAN (IDBaiViet, IDBaiVietLienQuan, LoaiLienKet, TrongSo)
+    SELECT @BaiThoCung, @BaiTet, 'GOI_Y', 1.50
+    WHERE NOT EXISTS (
+        SELECT 1 FROM BAI_VIET_LIEN_QUAN
+        WHERE IDBaiViet = @BaiThoCung AND IDBaiVietLienQuan = @BaiTet AND LoaiLienKet = 'GOI_Y'
+    );
+
+    INSERT INTO BAI_VIET_LIEN_QUAN (IDBaiViet, IDBaiVietLienQuan, LoaiLienKet, TrongSo)
+    SELECT @BaiAoDai, @BaiTet, 'CUNG_CHU_DE', 1.10
+    WHERE NOT EXISTS (
+        SELECT 1 FROM BAI_VIET_LIEN_QUAN
+        WHERE IDBaiViet = @BaiAoDai AND IDBaiVietLienQuan = @BaiTet AND LoaiLienKet = 'CUNG_CHU_DE'
+    );
+
+    INSERT INTO BAI_VIET_LIEN_QUAN (IDBaiViet, IDBaiVietLienQuan, LoaiLienKet, TrongSo)
+    SELECT @BaiNhaRong, @BaiCongChieng, 'CUNG_VUNG', 1.80
+    WHERE NOT EXISTS (
+        SELECT 1 FROM BAI_VIET_LIEN_QUAN
+        WHERE IDBaiViet = @BaiNhaRong AND IDBaiVietLienQuan = @BaiCongChieng AND LoaiLienKet = 'CUNG_VUNG'
+    );
+
+    INSERT INTO BAI_VIET_LIEN_QUAN (IDBaiViet, IDBaiVietLienQuan, LoaiLienKet, TrongSo)
+    SELECT @BaiPho, @BaiTet, 'GOI_Y', 1.20
+    WHERE NOT EXISTS (
+        SELECT 1 FROM BAI_VIET_LIEN_QUAN
+        WHERE IDBaiViet = @BaiPho AND IDBaiVietLienQuan = @BaiTet AND LoaiLienKet = 'GOI_Y'
+    );
+
+    /* =========================================================
+       13. XUAT BAN BAI VIET
+       ========================================================= */
+    UPDATE BAI_VIET
+    SET TrangThai = 'DA_XUAT_BAN',
+        NgayDuyet = SYSUTCDATETIME(),
+        IDNguoiDuyet = @ReviewerId,
+        NgayXuatBan = SYSUTCDATETIME(),
+        IDNguoiXuatBan = @SuperAdminId,
+        IDNguoiCapNhat = @SuperAdminId
+    WHERE IDBaiViet IN (@BaiTet,@BaiThoCung,@BaiAoDai,@BaiCaTru,@BaiNhaRong,@BaiPho,@BaiCongChieng)
+      AND TrangThai <> 'DA_XUAT_BAN';
+
+    /* =========================================================
+       14. PHIEN NGUOI DUNG + TIM KIEM + XEM BAI VIET
+       ========================================================= */
+    SELECT @PhienKhachEN = IDPhien FROM PHIEN_NGUOI_DUNG WHERE URLGioiThieu = N'https://demo.vnculturebridge.ai/landing-en';
+    IF @PhienKhachEN IS NULL
+    BEGIN
+        INSERT INTO PHIEN_NGUOI_DUNG
+        (
+            LoaiPhien, MaNgonNguUuTien, MaQuocGiaNguoiDung, LoaiThietBi,
+            ThongTinTrinhDuyet, URLGioiThieu, DongYPhanTich, KetThucLuc
+        )
+        VALUES
+        (
+            'KHACH', 'en', 'US', N'Desktop',
+            N'Chrome 135', N'https://demo.vnculturebridge.ai/landing-en', 1, NULL
+        );
+
+        SELECT @PhienKhachEN = IDPhien FROM PHIEN_NGUOI_DUNG WHERE URLGioiThieu = N'https://demo.vnculturebridge.ai/landing-en';
+    END;
+
+    SELECT @PhienKhachVI = IDPhien FROM PHIEN_NGUOI_DUNG WHERE URLGioiThieu = N'https://demo.vnculturebridge.ai/landing-vi';
+    IF @PhienKhachVI IS NULL
+    BEGIN
+        INSERT INTO PHIEN_NGUOI_DUNG
+        (
+            LoaiPhien, MaNgonNguUuTien, MaQuocGiaNguoiDung, LoaiThietBi,
+            ThongTinTrinhDuyet, URLGioiThieu, DongYPhanTich, KetThucLuc
+        )
+        VALUES
+        (
+            'KHACH', 'vi', 'VN', N'Mobile',
+            N'Safari iOS', N'https://demo.vnculturebridge.ai/landing-vi', 1, NULL
+        );
+
+        SELECT @PhienKhachVI = IDPhien FROM PHIEN_NGUOI_DUNG WHERE URLGioiThieu = N'https://demo.vnculturebridge.ai/landing-vi';
+    END;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM NHAT_KY_TIM_KIEM
+        WHERE IDPhien = @PhienKhachEN AND TuKhoaTimKiem = N'What is Tet?'
+    )
+    BEGIN
+        INSERT INTO NHAT_KY_TIM_KIEM
+        (
+            IDPhien, TuKhoaTimKiem, MaNgonNgu, KieuTimKiem, SoKetQua, CoKetQuaPhuHop
+        )
+        VALUES
+        (@PhienKhachEN, N'What is Tet?', 'en', 'KET_HOP', 3, 1);
+    END;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM NHAT_KY_TIM_KIEM
+        WHERE IDPhien = @PhienKhachEN AND TuKhoaTimKiem = N'ancestor worship'
+    )
+    BEGIN
+        INSERT INTO NHAT_KY_TIM_KIEM
+        (
+            IDPhien, TuKhoaTimKiem, MaNgonNgu, KieuTimKiem, SoKetQua, CoKetQuaPhuHop
+        )
+        VALUES
+        (@PhienKhachEN, N'ancestor worship', 'en', 'NGU_NGHIA', 2, 1);
+    END;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM NHAT_KY_TIM_KIEM
+        WHERE IDPhien = @PhienKhachVI AND TuKhoaTimKiem = N'nhà rông'
+    )
+    BEGIN
+        INSERT INTO NHAT_KY_TIM_KIEM
+        (
+            IDPhien, TuKhoaTimKiem, MaNgonNgu, KieuTimKiem, SoKetQua, CoKetQuaPhuHop
+        )
+        VALUES
+        (@PhienKhachVI, N'nhà rông', 'vi', 'TU_KHOA', 1, 1);
+    END;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM NHAT_KY_XEM_BAI_VIET WHERE IDPhien = @PhienKhachEN AND IDBaiViet = @BaiTet
+    )
+    BEGIN
+        INSERT INTO NHAT_KY_XEM_BAI_VIET
+        (
+            IDPhien, IDBaiViet, MaNgonNgu, SoGiayXem, NguonTruyCap
+        )
+        VALUES
+        (@PhienKhachEN, @BaiTet, 'en', 98, 'TIM_KIEM');
+    END;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM NHAT_KY_XEM_BAI_VIET WHERE IDPhien = @PhienKhachEN AND IDBaiViet = @BaiThoCung
+    )
+    BEGIN
+        INSERT INTO NHAT_KY_XEM_BAI_VIET
+        (
+            IDPhien, IDBaiViet, MaNgonNgu, SoGiayXem, NguonTruyCap
+        )
+        VALUES
+        (@PhienKhachEN, @BaiThoCung, 'en', 126, 'AI');
+    END;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM NHAT_KY_XEM_BAI_VIET WHERE IDPhien = @PhienKhachVI AND IDBaiViet = @BaiNhaRong
+    )
+    BEGIN
+        INSERT INTO NHAT_KY_XEM_BAI_VIET
+        (
+            IDPhien, IDBaiViet, MaNgonNgu, SoGiayXem, NguonTruyCap
+        )
+        VALUES
+        (@PhienKhachVI, @BaiNhaRong, 'vi', 74, 'BAN_DO');
+    END;
+
+    /* =========================================================
+       15. AI CHAT
+       ========================================================= */
+    SELECT @PhienChat1 = IDPhienChat
+    FROM PHIEN_CHAT_AI
+    WHERE IDPhienNguoiDung = @PhienKhachEN AND TieuDeHoiThoai = N'Understanding Tet and ancestor worship';
+
+    IF @PhienChat1 IS NULL
+    BEGIN
+        INSERT INTO PHIEN_CHAT_AI
+        (
+            IDPhienNguoiDung, MaNgonNguPhien, MaQuocGiaNguoiDung, TieuDeHoiThoai, KetThucLuc
+        )
+        VALUES
+        (
+            @PhienKhachEN, 'en', 'US', N'Understanding Tet and ancestor worship', SYSUTCDATETIME()
+        );
+
+        SELECT @PhienChat1 = IDPhienChat
+        FROM PHIEN_CHAT_AI
+        WHERE IDPhienNguoiDung = @PhienKhachEN AND TieuDeHoiThoai = N'Understanding Tet and ancestor worship';
+    END;
+
+    IF NOT EXISTS (SELECT 1 FROM TIN_NHAN_CHAT_AI WHERE IDPhienChat = @PhienChat1 AND ThuTuTinNhan = 1)
+    BEGIN
+        INSERT INTO TIN_NHAN_CHAT_AI
+        (
+            IDPhienChat, LoaiNguoiGui, ThuTuTinNhan, MaNgonNgu,
+            NoiDungTinNhan, MaYDinh, NgoaiPhamVi, LaNoiDungNhayCam,
+            DuCanCuDuLieu
+        )
+        VALUES
+        (
+            @PhienChat1, 'NGUOI_DUNG', 1, 'en',
+            N'Why is Tet so important in Vietnam?',
+            N'EXPLAIN_CULTURE', 0, 0, 1
+        );
+    END;
+
+    IF NOT EXISTS (SELECT 1 FROM TIN_NHAN_CHAT_AI WHERE IDPhienChat = @PhienChat1 AND ThuTuTinNhan = 2)
+    BEGIN
+        INSERT INTO TIN_NHAN_CHAT_AI
+        (
+            IDPhienChat, LoaiNguoiGui, ThuTuTinNhan, MaNgonNgu,
+            NoiDungTinNhan, MaYDinh, DiemTinCay, TraLoiTot,
+            NgoaiPhamVi, LaNoiDungNhayCam, DuCanCuDuLieu,
+            ThoiGianPhanHoiMs, SoPromptToken, SoCompletionToken
+        )
+        VALUES
+        (
+            @PhienChat1, 'AI', 2, 'en',
+            N'Tet is important because it combines family reunion, ancestor remembrance, and the symbolic beginning of a new year. It is both a festive celebration and a cultural framework for renewing social bonds.',
+            N'EXPLAIN_CULTURE', 0.9420, 1,
+            0, 0, 1,
+            1260, 820, 168
+        );
+    END;
+
+    IF NOT EXISTS (SELECT 1 FROM TIN_NHAN_CHAT_AI WHERE IDPhienChat = @PhienChat1 AND ThuTuTinNhan = 3)
+    BEGIN
+        INSERT INTO TIN_NHAN_CHAT_AI
+        (
+            IDPhienChat, LoaiNguoiGui, ThuTuTinNhan, MaNgonNgu,
+            NoiDungTinNhan, MaYDinh, NgoaiPhamVi, LaNoiDungNhayCam,
+            DuCanCuDuLieu
+        )
+        VALUES
+        (
+            @PhienChat1, 'NGUOI_DUNG', 3, 'en',
+            N'Is ancestor worship a religion?',
+            N'CLARIFY_CULTURE', 0, 0, 1
+        );
+    END;
+
+    IF NOT EXISTS (SELECT 1 FROM TIN_NHAN_CHAT_AI WHERE IDPhienChat = @PhienChat1 AND ThuTuTinNhan = 4)
+    BEGIN
+        INSERT INTO TIN_NHAN_CHAT_AI
+        (
+            IDPhienChat, LoaiNguoiGui, ThuTuTinNhan, MaNgonNgu,
+            NoiDungTinNhan, MaYDinh, DiemTinCay, TraLoiTot,
+            NgoaiPhamVi, LaNoiDungNhayCam, DuCanCuDuLieu,
+            ThoiGianPhanHoiMs, SoPromptToken, SoCompletionToken
+        )
+        VALUES
+        (
+            @PhienChat1, 'AI', 4, 'en',
+            N'In many Vietnamese families, ancestor worship is better understood as a cultural and familial practice, although it may overlap with religious life depending on context.',
+            N'CLARIFY_CULTURE', 0.9115, 1,
+            0, 0, 1,
+            1180, 640, 121
+        );
+    END;
+
+    SELECT @TinNhanAI1 = IDTinNhan FROM TIN_NHAN_CHAT_AI WHERE IDPhienChat = @PhienChat1 AND ThuTuTinNhan = 2;
+    SELECT @TinNhanAI2 = IDTinNhan FROM TIN_NHAN_CHAT_AI WHERE IDPhienChat = @PhienChat1 AND ThuTuTinNhan = 4;
+
+    SELECT @PhienChat2 = IDPhienChat
+    FROM PHIEN_CHAT_AI
+    WHERE IDPhienNguoiDung = @PhienKhachEN AND TieuDeHoiThoai = N'Question outside knowledge scope';
+
+    IF @PhienChat2 IS NULL
+    BEGIN
+        INSERT INTO PHIEN_CHAT_AI
+        (
+            IDPhienNguoiDung, MaNgonNguPhien, MaQuocGiaNguoiDung, TieuDeHoiThoai, KetThucLuc
+        )
+        VALUES
+        (
+            @PhienKhachEN, 'en', 'US', N'Question outside knowledge scope', SYSUTCDATETIME()
+        );
+
+        SELECT @PhienChat2 = IDPhienChat
+        FROM PHIEN_CHAT_AI
+        WHERE IDPhienNguoiDung = @PhienKhachEN AND TieuDeHoiThoai = N'Question outside knowledge scope';
+    END;
+
+    IF NOT EXISTS (SELECT 1 FROM TIN_NHAN_CHAT_AI WHERE IDPhienChat = @PhienChat2 AND ThuTuTinNhan = 1)
+    BEGIN
+        INSERT INTO TIN_NHAN_CHAT_AI
+        (
+            IDPhienChat, LoaiNguoiGui, ThuTuTinNhan, MaNgonNgu,
+            NoiDungTinNhan, MaYDinh, NgoaiPhamVi, LaNoiDungNhayCam,
+            DuCanCuDuLieu
+        )
+        VALUES
+        (
+            @PhienChat2, 'NGUOI_DUNG', 1, 'en',
+            N'Can you explain Korean palace rituals?',
+            N'ASK_OUT_OF_SCOPE', 1, 0, 0
+        );
+    END;
+
+    IF NOT EXISTS (SELECT 1 FROM TIN_NHAN_CHAT_AI WHERE IDPhienChat = @PhienChat2 AND ThuTuTinNhan = 2)
+    BEGIN
+        INSERT INTO TIN_NHAN_CHAT_AI
+        (
+            IDPhienChat, LoaiNguoiGui, ThuTuTinNhan, MaNgonNgu,
+            NoiDungTinNhan, MaYDinh, DiemTinCay, TraLoiTot,
+            NgoaiPhamVi, LaNoiDungNhayCam, DuCanCuDuLieu,
+            ThoiGianPhanHoiMs, SoPromptToken, SoCompletionToken
+        )
+        VALUES
+        (
+            @PhienChat2, 'AI', 2, 'en',
+            N'I do not have enough grounded data in this knowledge base to explain Korean palace rituals confidently. I can instead help you explore a Vietnamese cultural topic available in the system.',
+            N'ASK_OUT_OF_SCOPE', 0.3220, 1,
+            1, 0, 0,
+            890, 420, 72
+        );
+    END;
+
+    SELECT @TinNhanAI3 = IDTinNhan FROM TIN_NHAN_CHAT_AI WHERE IDPhienChat = @PhienChat2 AND ThuTuTinNhan = 2;
+
+    IF NOT EXISTS (SELECT 1 FROM CAU_HOI_CAN_BO_SUNG WHERE IDTinNhan = @TinNhanAI3)
+    BEGIN
+        INSERT INTO CAU_HOI_CAN_BO_SUNG
+        (
+            IDTinNhan, LyDo, GoiYXuLy, TrangThai
+        )
+        VALUES
+        (
+            @TinNhanAI3, 'NGOAI_PHAM_VI',
+            N'Cân nhắc mở rộng tri thức sang chủ đề so sánh văn hoá Đông Á nếu phù hợp phạm vi đề tài.',
+            'MOI'
+        );
+    END;
+
+    /* =========================================================
+       16. DONG BO TRI THUC AI
+       ========================================================= */
+    IF NOT EXISTS (
+        SELECT 1 FROM DOT_DONG_BO_TRI_THUC_AI
+        WHERE LoaiDongBo = 'TANG_DAN' AND TrangThai = 'THANH_CONG'
+    )
+    BEGIN
+        INSERT INTO DOT_DONG_BO_TRI_THUC_AI
+        (
+            LoaiDongBo, TrangThai, BatDauLuc, KetThucLuc, IDNguoiKichHoat, ThongBaoLoi
+        )
+        VALUES
+        (
+            'TANG_DAN', 'THANH_CONG',
+            DATEADD(MINUTE, -5, SYSUTCDATETIME()), SYSUTCDATETIME(),
+            @AIAdminId, NULL
+        );
+    END;
+
+    SELECT TOP 1 @DotDongBo1 = IDDotDongBo
+    FROM DOT_DONG_BO_TRI_THUC_AI
+    WHERE LoaiDongBo = 'TANG_DAN' AND TrangThai = 'THANH_CONG'
+    ORDER BY IDDotDongBo DESC;
+
+    IF NOT EXISTS (SELECT 1 FROM CHI_TIET_DONG_BO_TRI_THUC_AI WHERE IDDotDongBo = @DotDongBo1 AND IDBaiViet = @BaiTet)
+        INSERT INTO CHI_TIET_DONG_BO_TRI_THUC_AI (IDDotDongBo, IDBaiViet, TrangThai, SoDoanChunk, ThongBaoLoi)
+        VALUES (@DotDongBo1, @BaiTet, 'THANH_CONG', 2, NULL);
+
+    IF NOT EXISTS (SELECT 1 FROM CHI_TIET_DONG_BO_TRI_THUC_AI WHERE IDDotDongBo = @DotDongBo1 AND IDBaiViet = @BaiThoCung)
+        INSERT INTO CHI_TIET_DONG_BO_TRI_THUC_AI (IDDotDongBo, IDBaiViet, TrangThai, SoDoanChunk, ThongBaoLoi)
+        VALUES (@DotDongBo1, @BaiThoCung, 'THANH_CONG', 2, NULL);
+
+    IF NOT EXISTS (SELECT 1 FROM CHI_TIET_DONG_BO_TRI_THUC_AI WHERE IDDotDongBo = @DotDongBo1 AND IDBaiViet = @BaiAoDai)
+        INSERT INTO CHI_TIET_DONG_BO_TRI_THUC_AI (IDDotDongBo, IDBaiViet, TrangThai, SoDoanChunk, ThongBaoLoi)
+        VALUES (@DotDongBo1, @BaiAoDai, 'THANH_CONG', 2, NULL);
+
+    /* Lay phien ban xuat ban hien tai */
+    DECLARE @PhienBanTet BIGINT, @PhienBanThoCung BIGINT, @PhienBanAoDai BIGINT;
+    SELECT @PhienBanTet = IDPhienBanXuatBanHienTai FROM BAI_VIET WHERE IDBaiViet = @BaiTet;
+    SELECT @PhienBanThoCung = IDPhienBanXuatBanHienTai FROM BAI_VIET WHERE IDBaiViet = @BaiThoCung;
+    SELECT @PhienBanAoDai = IDPhienBanXuatBanHienTai FROM BAI_VIET WHERE IDBaiViet = @BaiAoDai;
+
+    IF NOT EXISTS (SELECT 1 FROM TAI_LIEU_TRI_THUC_AI WHERE IDBaiViet = @BaiTet AND MaNgonNgu = 'vi')
+    BEGIN
+        INSERT INTO TAI_LIEU_TRI_THUC_AI
+        (
+            IDBaiViet, MaNgonNgu, IDPhienBan, TieuDeTaiLieu,
+            MetadataJson, HoatDong, NhaCungCapEmbedding, NgayEmbedding
+        )
+        VALUES
+        (
+            @BaiTet, 'vi', @PhienBanTet, N'Tri thức AI - Tết Nguyên Đán (VI)',
+            N'{"slug":"tet-nguyen-dan-viet-nam","source":"article","region":["MIEN_BAC","MIEN_TRUNG","MIEN_NAM"]}',
+            1, N'openai-text-embedding-demo', SYSUTCDATETIME()
+        );
+    END;
+
+    IF NOT EXISTS (SELECT 1 FROM TAI_LIEU_TRI_THUC_AI WHERE IDBaiViet = @BaiTet AND MaNgonNgu = 'en')
+    BEGIN
+        INSERT INTO TAI_LIEU_TRI_THUC_AI
+        (
+            IDBaiViet, MaNgonNgu, IDPhienBan, TieuDeTaiLieu,
+            MetadataJson, HoatDong, NhaCungCapEmbedding, NgayEmbedding
+        )
+        VALUES
+        (
+            @BaiTet, 'en', @PhienBanTet, N'AI Knowledge - Tet Nguyen Dan (EN)',
+            N'{"slug":"tet-nguyen-dan-viet-nam","source":"article","language":"en"}',
+            1, N'openai-text-embedding-demo', SYSUTCDATETIME()
+        );
+    END;
+
+    IF NOT EXISTS (SELECT 1 FROM TAI_LIEU_TRI_THUC_AI WHERE IDBaiViet = @BaiThoCung AND MaNgonNgu = 'en')
+    BEGIN
+        INSERT INTO TAI_LIEU_TRI_THUC_AI
+        (
+            IDBaiViet, MaNgonNgu, IDPhienBan, TieuDeTaiLieu,
+            MetadataJson, HoatDong, NhaCungCapEmbedding, NgayEmbedding
+        )
+        VALUES
+        (
+            @BaiThoCung, 'en', @PhienBanThoCung, N'AI Knowledge - Ancestor Worship (EN)',
+            N'{"slug":"tho-cung-to-tien-viet-nam","source":"article","language":"en"}',
+            1, N'openai-text-embedding-demo', SYSUTCDATETIME()
+        );
+    END;
+
+    IF NOT EXISTS (SELECT 1 FROM TAI_LIEU_TRI_THUC_AI WHERE IDBaiViet = @BaiAoDai AND MaNgonNgu = 'en')
+    BEGIN
+        INSERT INTO TAI_LIEU_TRI_THUC_AI
+        (
+            IDBaiViet, MaNgonNgu, IDPhienBan, TieuDeTaiLieu,
+            MetadataJson, HoatDong, NhaCungCapEmbedding, NgayEmbedding
+        )
+        VALUES
+        (
+            @BaiAoDai, 'en', @PhienBanAoDai, N'AI Knowledge - Ao Dai (EN)',
+            N'{"slug":"ao-dai-viet-nam","source":"article","language":"en"}',
+            1, N'openai-text-embedding-demo', SYSUTCDATETIME()
+        );
+    END;
+
+    SELECT @TaiLieuTetVI = IDTaiLieuTriThuc FROM TAI_LIEU_TRI_THUC_AI WHERE IDBaiViet = @BaiTet AND MaNgonNgu = 'vi';
+    SELECT @TaiLieuTetEN = IDTaiLieuTriThuc FROM TAI_LIEU_TRI_THUC_AI WHERE IDBaiViet = @BaiTet AND MaNgonNgu = 'en';
+    SELECT @TaiLieuThoCungEN = IDTaiLieuTriThuc FROM TAI_LIEU_TRI_THUC_AI WHERE IDBaiViet = @BaiThoCung AND MaNgonNgu = 'en';
+    SELECT @TaiLieuAoDaiEN = IDTaiLieuTriThuc FROM TAI_LIEU_TRI_THUC_AI WHERE IDBaiViet = @BaiAoDai AND MaNgonNgu = 'en';
+
+    IF NOT EXISTS (SELECT 1 FROM DOAN_TRI_THUC_AI WHERE IDTaiLieuTriThuc = @TaiLieuTetVI AND SoThuTuDoan = 1)
+    BEGIN
+        INSERT INTO DOAN_TRI_THUC_AI
+        (
+            IDTaiLieuTriThuc, SoThuTuDoan, NoiDungDoan, SoToken, KhoaEmbedding, MetadataJson
+        )
+        VALUES
+        (
+            @TaiLieuTetVI, 1,
+            N'Tết Nguyên Đán là dịp sum họp gia đình, tưởng nhớ tổ tiên và khởi đầu một năm mới trong văn hoá Việt Nam.',
+            42, N'emb_tet_vi_001', N'{"section":"intro"}'
+        );
+    END;
+
+    IF NOT EXISTS (SELECT 1 FROM DOAN_TRI_THUC_AI WHERE IDTaiLieuTriThuc = @TaiLieuTetEN AND SoThuTuDoan = 1)
+    BEGIN
+        INSERT INTO DOAN_TRI_THUC_AI
+        (
+            IDTaiLieuTriThuc, SoThuTuDoan, NoiDungDoan, SoToken, KhoaEmbedding, MetadataJson
+        )
+        VALUES
+        (
+            @TaiLieuTetEN, 1,
+            N'Tet combines family reunion, remembrance of ancestors, and the symbolic beginning of a new year in Vietnam.',
+            37, N'emb_tet_en_001', N'{"section":"intro"}'
+        );
+    END;
+
+    IF NOT EXISTS (SELECT 1 FROM DOAN_TRI_THUC_AI WHERE IDTaiLieuTriThuc = @TaiLieuThoCungEN AND SoThuTuDoan = 1)
+    BEGIN
+        INSERT INTO DOAN_TRI_THUC_AI
+        (
+            IDTaiLieuTriThuc, SoThuTuDoan, NoiDungDoan, SoToken, KhoaEmbedding, MetadataJson
+        )
+        VALUES
+        (
+            @TaiLieuThoCungEN, 1,
+            N'Ancestor worship in Vietnam is often understood as a cultural and familial practice linked to filial piety and continuity.',
+            39, N'emb_ancestor_en_001', N'{"section":"meaning"}'
+        );
+    END;
+
+    IF NOT EXISTS (SELECT 1 FROM DOAN_TRI_THUC_AI WHERE IDTaiLieuTriThuc = @TaiLieuAoDaiEN AND SoThuTuDoan = 1)
+    BEGIN
+        INSERT INTO DOAN_TRI_THUC_AI
+        (
+            IDTaiLieuTriThuc, SoThuTuDoan, NoiDungDoan, SoToken, KhoaEmbedding, MetadataJson
+        )
+        VALUES
+        (
+            @TaiLieuAoDaiEN, 1,
+            N'The ao dai is a visual symbol of Vietnamese elegance and cultural identity in both traditional and modern settings.',
+            35, N'emb_aodai_en_001', N'{"section":"symbolism"}'
+        );
+    END;
+
+    SELECT @DoanTetVI1 = IDDoan FROM DOAN_TRI_THUC_AI WHERE IDTaiLieuTriThuc = @TaiLieuTetVI AND SoThuTuDoan = 1;
+    SELECT @DoanTetEN1 = IDDoan FROM DOAN_TRI_THUC_AI WHERE IDTaiLieuTriThuc = @TaiLieuTetEN AND SoThuTuDoan = 1;
+    SELECT @DoanThoCungEN1 = IDDoan FROM DOAN_TRI_THUC_AI WHERE IDTaiLieuTriThuc = @TaiLieuThoCungEN AND SoThuTuDoan = 1;
+    SELECT @DoanAoDaiEN1 = IDDoan FROM DOAN_TRI_THUC_AI WHERE IDTaiLieuTriThuc = @TaiLieuAoDaiEN AND SoThuTuDoan = 1;
+
+    IF NOT EXISTS (SELECT 1 FROM TRICH_DAN_TIN_NHAN_AI WHERE IDTinNhan = @TinNhanAI1 AND IDDoan = @DoanTetEN1)
+    BEGIN
+        INSERT INTO TRICH_DAN_TIN_NHAN_AI
+        (
+            IDTinNhan, IDTaiLieuTriThuc, IDDoan, ThuTuTrichDan, DoanTrichYeu
+        )
+        VALUES
+        (
+            @TinNhanAI1, @TaiLieuTetEN, @DoanTetEN1, 1,
+            N'Tet combines family reunion, remembrance of ancestors, and a symbolic new beginning.'
+        );
+    END;
+
+    IF NOT EXISTS (SELECT 1 FROM TRICH_DAN_TIN_NHAN_AI WHERE IDTinNhan = @TinNhanAI2 AND IDDoan = @DoanThoCungEN1)
+    BEGIN
+        INSERT INTO TRICH_DAN_TIN_NHAN_AI
+        (
+            IDTinNhan, IDTaiLieuTriThuc, IDDoan, ThuTuTrichDan, DoanTrichYeu
+        )
+        VALUES
+        (
+            @TinNhanAI2, @TaiLieuThoCungEN, @DoanThoCungEN1, 1,
+            N'Ancestor worship is often a cultural and familial practice rather than a single doctrinal religion.'
+        );
+    END;
+
+    /* =========================================================
+       17. PHAN HOI NOI DUNG
+       ========================================================= */
+    IF NOT EXISTS (
+        SELECT 1 FROM PHAN_HOI_NOI_DUNG
+        WHERE IDPhien = @PhienKhachEN AND LoaiPhanHoi = 'BAI_VIET' AND IDBaiViet = @BaiTet
+    )
+    BEGIN
+        INSERT INTO PHAN_HOI_NOI_DUNG
+        (
+            IDPhien, LoaiPhanHoi, IDBaiViet, DiemDanhGia, HuuIch, NoiDungPhanHoi,
+            TrangThaiXuLy, IDNguoiXuLy, NgayXuLy
+        )
+        VALUES
+        (
+            @PhienKhachEN, 'BAI_VIET', @BaiTet, 5, 1,
+            N'Bài viết dễ hiểu và giải thích rõ vì sao Tết quan trọng.',
+            'DA_XU_LY', @ContentAdminId, SYSUTCDATETIME()
+        );
+    END;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM PHAN_HOI_NOI_DUNG
+        WHERE IDPhien = @PhienKhachEN AND LoaiPhanHoi = 'TRA_LOI_AI' AND IDTinNhan = @TinNhanAI2
+    )
+    BEGIN
+        INSERT INTO PHAN_HOI_NOI_DUNG
+        (
+            IDPhien, LoaiPhanHoi, IDTinNhan, DiemDanhGia, HuuIch, NoiDungPhanHoi,
+            TrangThaiXuLy, IDNguoiXuLy, NgayXuLy
+        )
+        VALUES
+        (
+            @PhienKhachEN, 'TRA_LOI_AI', @TinNhanAI2, 5, 1,
+            N'The explanation was nuanced and did not overstate certainty.',
+            'DA_XEM', @AIAdminId, SYSUTCDATETIME()
+        );
+    END;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM PHAN_HOI_NOI_DUNG
+        WHERE IDPhien = @PhienKhachVI AND LoaiPhanHoi = 'CHUNG'
+    )
+    BEGIN
+        INSERT INTO PHAN_HOI_NOI_DUNG
+        (
+            IDPhien, LoaiPhanHoi, DiemDanhGia, HuuIch, NoiDungPhanHoi,
+            TrangThaiXuLy
+        )
+        VALUES
+        (
+            @PhienKhachVI, 'CHUNG', 4, 1,
+            N'Giao diện dễ dùng, nên bổ sung thêm bài về phong tục cưới hỏi.',
+            'MOI'
+        );
+    END;
+
+    /* =========================================================
+       18. NHAT KY QUAN TRI
+       ========================================================= */
+    IF NOT EXISTS (
+        SELECT 1 FROM NHAT_KY_QUAN_TRI
+        WHERE IDNguoiDung = @ContentAdminId AND TenThucThe = 'BAI_VIET' AND GiaTriKhoa = CAST(@BaiTet AS NVARCHAR(100))
+    )
+    BEGIN
+        INSERT INTO NHAT_KY_QUAN_TRI
+        (
+            IDNguoiDung, LoaiHanhDong, TenThucThe, GiaTriKhoa,
+            DuLieuCuJson, DuLieuMoiJson, GhiChu
+        )
+        VALUES
+        (
+            @ContentAdminId, 'TAO_MOI', 'BAI_VIET', CAST(@BaiTet AS NVARCHAR(100)),
+            NULL,
+            N'{"slug":"tet-nguyen-dan-viet-nam","status":"NHAP"}',
+            N'Tạo bài viết Tết'
+        );
+    END;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM NHAT_KY_QUAN_TRI
+        WHERE IDNguoiDung = @ReviewerId AND TenThucThe = 'BAI_VIET' AND GiaTriKhoa = CAST(@BaiThoCung AS NVARCHAR(100)) AND LoaiHanhDong = 'DUYET'
+    )
+    BEGIN
+        INSERT INTO NHAT_KY_QUAN_TRI
+        (
+            IDNguoiDung, LoaiHanhDong, TenThucThe, GiaTriKhoa,
+            DuLieuCuJson, DuLieuMoiJson, GhiChu
+        )
+        VALUES
+        (
+            @ReviewerId, 'DUYET', 'BAI_VIET', CAST(@BaiThoCung AS NVARCHAR(100)),
+            N'{"status":"CHO_DUYET"}',
+            N'{"status":"DA_DUYET"}',
+            N'Duyệt nội dung thờ cúng tổ tiên'
+        );
+    END;
+
+    IF NOT EXISTS (
+        SELECT 1 FROM NHAT_KY_QUAN_TRI
+        WHERE IDNguoiDung = @AIAdminId AND TenThucThe = 'DOT_DONG_BO_TRI_THUC_AI' AND GiaTriKhoa = CAST(@DotDongBo1 AS NVARCHAR(100))
+    )
+    BEGIN
+        INSERT INTO NHAT_KY_QUAN_TRI
+        (
+            IDNguoiDung, LoaiHanhDong, TenThucThe, GiaTriKhoa,
+            DuLieuCuJson, DuLieuMoiJson, GhiChu
+        )
+        VALUES
+        (
+            @AIAdminId, 'KICH_HOAT_DONG_BO', 'DOT_DONG_BO_TRI_THUC_AI', CAST(@DotDongBo1 AS NVARCHAR(100)),
+            NULL,
+            N'{"type":"TANG_DAN","status":"THANH_CONG"}',
+            N'Đồng bộ tri thức AI thành công'
+        );
+    END;
+
+    COMMIT TRAN;
+
+    /* =========================================================
+       19. KIEM TRA NHANH
+       ========================================================= */
+    SELECT IDNguoiDung, TenDangNhap, HoTen, TrangThai
+    FROM QUAN_TRI_NGUOI_DUNG
+    WHERE TenDangNhap IN (N'superadmin', N'contentadmin', N'reviewer', N'aiadmin');
+
+    SELECT IDBaiViet, DuongDanSeo, LoaiBaiViet, TrangThai, TrangThaiDongBoAI, IDPhienBanXuatBanHienTai
+    FROM BAI_VIET
+    WHERE IDBaiViet IN (@BaiTet,@BaiThoCung,@BaiAoDai,@BaiCaTru,@BaiNhaRong,@BaiPho,@BaiCongChieng)
+    ORDER BY IDBaiViet;
+
+    SELECT IDBaiViet, MaNgonNgu, TieuDe, TrangThaiBanDich
+    FROM BAI_VIET_BAN_DICH
+    WHERE IDBaiViet IN (@BaiTet,@BaiThoCung,@BaiAoDai,@BaiCaTru,@BaiNhaRong,@BaiPho,@BaiCongChieng)
+    ORDER BY IDBaiViet, MaNgonNgu;
+
+    SELECT TOP 20 *
+    FROM PHIEN_BAN_BAI_VIET
+    WHERE IDBaiViet IN (@BaiTet,@BaiThoCung,@BaiAoDai,@BaiCaTru,@BaiNhaRong,@BaiPho,@BaiCongChieng)
+    ORDER BY IDPhienBan DESC;
+
+    SELECT TOP 20 *
+    FROM LICH_SU_TRANG_THAI_BAI_VIET
+    WHERE IDBaiViet IN (@BaiTet,@BaiThoCung,@BaiAoDai,@BaiCaTru,@BaiNhaRong,@BaiPho,@BaiCongChieng)
+    ORDER BY IDLichSu DESC;
+
+    SELECT TOP 20 *
+    FROM TIN_NHAN_CHAT_AI
+    WHERE IDPhienChat IN (@PhienChat1,@PhienChat2)
+    ORDER BY IDTinNhan;
+
+END TRY
+BEGIN CATCH
+    IF @@TRANCOUNT > 0
+        ROLLBACK TRAN;
+
+    THROW;
+END CATCH;
