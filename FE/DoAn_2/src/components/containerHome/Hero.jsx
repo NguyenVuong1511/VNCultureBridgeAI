@@ -1,30 +1,32 @@
 import { Parallax } from "react-parallax";
-import { motion, scale } from "framer-motion";
+import { motion } from "framer-motion";
 import styles from "./Hero.module.css";
 import { useNavigate } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 
 export default function Hero() {
   const navigate = useNavigate();
+  const { t } = useTranslation();
+
   const handleGetStarted = () => {
     const currentAcc = localStorage.getItem("CurrentAcc");
     const isLoggedIn = currentAcc !== null;
 
     if (isLoggedIn) {
-      // Cuộn mượt xuống section #topics
       const section = document.getElementById("places");
       if (section) {
         section.scrollIntoView({ behavior: "smooth" });
       }
     } else {
-      // Chuyển trang đăng nhập
       navigate("/signin");
     }
   };
+
   return (
     <section id="home" className={styles.hero}>
       <Parallax
-        bgImage="/img/Banner.png" // ảnh nền
-        strength={400} // độ mạnh parallax
+        bgImage="/img/Banner.png"
+        strength={400}
         className={styles.banner}
       >
         <div className={styles.content}>
@@ -34,7 +36,7 @@ export default function Hero() {
             transition={{ duration: 1 }}
             viewport={{ once: false }}
           >
-            Discover Vietnamese Culture
+            {t('hero.title')}
           </motion.h1>
 
           <motion.p
@@ -43,25 +45,18 @@ export default function Hero() {
             transition={{ delay: 0.3, duration: 1 }}
             viewport={{ once: false }}
           >
-            Explore traditional food, festivals, clothing, and customs of
-            Vietnam.
+            {t('hero.subtitle')}
           </motion.p>
 
           <motion.button
             className={styles.ctaBtn}
             initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{
-              opacity: 1,
-              scale: 1,
-              
-            }}
-            whileHover={{
-              scale: 1.08,
-            }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            whileHover={{ scale: 1.08 }}
             viewport={{ once: false }}
             onClick={handleGetStarted}
           >
-            Get Started
+            {t('hero.explore_btn')}
           </motion.button>
         </div>
       </Parallax>

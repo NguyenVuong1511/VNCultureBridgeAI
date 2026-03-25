@@ -3,9 +3,11 @@ import { FaStar } from "react-icons/fa";
 import styles from "./Feedback.module.css";
 import { motion } from "framer-motion";
 import { feedbackApi } from "../../api/feedbackApi";
+import { useTranslation } from "react-i18next";
 
 export default function Feedback() {
   const [user, setUser] = useState(null);
+  const { t } = useTranslation();
 
   // 🔹 Lấy user từ localStorage (giống Navbar)
   useEffect(() => {
@@ -105,14 +107,14 @@ export default function Feedback() {
         viewport={{ once: false }}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
-        <h2 className={styles.feedbackTitle}>Feedback</h2>
+        <h2 className={styles.feedbackTitle}>{t('feedback.title')}</h2>
 
         {/* Form */}
         <form className={styles.feedbackForm} onSubmit={handleSubmit}>
           <textarea
             name="text"
             placeholder={
-              user ? "Your feedback" : "You must log in to leave a review"
+              user ? t('feedback.placeholder') : t('feedback.placeholder_login')
             }
             value={formData.text}
             onChange={handleChange}
@@ -139,7 +141,7 @@ export default function Feedback() {
           </div>
 
           <button type="submit" className={styles.submitBtn} disabled={!user}>
-            SUBMIT
+            {t('feedback.submit')}
           </button>
         </form>
 

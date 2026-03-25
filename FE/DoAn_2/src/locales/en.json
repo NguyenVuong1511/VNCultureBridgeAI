@@ -1,0 +1,70 @@
+{
+  "navbar": {
+    "home": "Home",
+    "discover": "Discover",
+    "cultural_regions": "Cultural Regions",
+    "ethnic_groups": "54 Ethnic Groups",
+    "heritage": "Cultural Heritage",
+    "events": "Events",
+    "news": "News",
+    "articles": "Articles",
+    "videos": "Videos",
+    "dictionary": "Multilingual Dictionary",
+    "ai_assistant": "AI Assistant",
+    "about": "About VCB",
+    "contact": "Contact",
+    "login": "Login",
+    "register": "Register",
+    "profile": "Profile",
+    "admin": "Admin",
+    "logout": "Logout",
+    "search_placeholder": "Search..."
+  },
+  "hero": {
+    "title": "Welcome to VNCultureBridge",
+    "subtitle": "Discover the profound beauty of Vietnamese culture. From ancient traditions to vibrant modern life, explore a rich tapestry of history, art, and heritage that connects generations.",
+    "explore_btn": "Explore Now"
+  },
+  "about": {
+    "title": "Vietnam Cultural Bridge",
+    "description_1": "Vietnam, a nation with thousands of years of civilization, is a place where knowledge and traditional beauty seamlessly blend. From majestic northern mountains to the fertile southern deltas, every inch of land is tied to heroic historical tales, unique customs, and warm hospitality.",
+    "description_2": "Exploring Vietnamese Culture is not just a journey back to its roots, but also an opportunity to experience the diversity of 54 ethnic groups. Each group carries a distinct color yet shares a spirit of unity, forging a vibrant and proud cultural tapestry."
+  },
+  "featured": {
+    "title": "Featured Cultural Articles",
+    "subtitle": "Dive deeper into the traditions, arts, and lifestyle that make Vietnamese culture so exceptionally unique.",
+    "read_more": "Read More"
+  },
+  "categories": {
+    "title": "Explore Culture",
+    "subtitle": "Learn about the distinctive aspects of Vietnamese life, beliefs, and arts through diverse topics."
+  },
+  "places": {
+    "title": "Cultural Map",
+    "subtitle": "Touch each region to discover its characteristic cultural features, from North to South."
+  },
+  "ethnic": {
+    "title": "54 Ethnic Communities",
+    "subtitle": "Vietnam proudly hosts 54 ethnic brotherly groups, each carrying a unique cultural identity, from language, clothing, customs to traditional arts, together forming a colorful and brilliant Vietnamese cultural landscape.",
+    "explore_all": "Explore All"
+  },
+  "ai": {
+    "title": "Explore Culture with AI Assistant",
+    "subtitle": "Chat, ask questions, and dive deeper into all aspects of Vietnamese culture with our smart AI assistant.",
+    "chat_now": "Chat Now"
+  },
+  "feedback": {
+    "title": "Feedback",
+    "placeholder_login": "You must log in to leave a review",
+    "placeholder": "Your feedback",
+    "submit": "SUBMIT"
+  },
+  "contact": {
+    "title": "Contact Us",
+    "name": "Full Name",
+    "email": "Your Email",
+    "message": "Content",
+    "send": "SEND",
+    "success": "Thank you for your feedback!"
+  }
+}

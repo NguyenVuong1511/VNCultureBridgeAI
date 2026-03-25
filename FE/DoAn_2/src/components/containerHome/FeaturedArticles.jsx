@@ -2,15 +2,17 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import styles from "./FeaturedArticles.module.css";
 import { articleApi } from "../../api/articleApi";
+import { useTranslation } from "react-i18next";
 
 export default function FeaturedArticles() {
   const [articles, setArticles] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     const fetchArticles = async () => {
       try {
-        const res = await articleApi.getFeaturedArticles();
+        const res = await articleApi.getFeaturedArticles(i18n.language);
         if (res && res.success && res.data) {
           setArticles(res.data);
         }
@@ -21,7 +23,7 @@ export default function FeaturedArticles() {
       }
     };
     fetchArticles();
-  }, []);
+  }, [i18n.language]);
 
   if (loading) {
     return <div className={styles.loading}>Loading featured content...</div>;
@@ -40,9 +42,9 @@ export default function FeaturedArticles() {
         viewport={{ once: true }}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
-        <h2 className={styles.title}>Featured Cultural Articles</h2>
+        <h2 className={styles.title}>{t('featured.title')}</h2>
         <p className={styles.subtitle}>
-          Dive deeper into the traditions, arts, and lifestyle that make Vietnamese culture so exceptionally unique.
+          {t('featured.subtitle')}
         </p>
         
         <div className={styles.grid}>
@@ -71,7 +73,7 @@ export default function FeaturedArticles() {
                 </p>
                 {/* Notice link points to /articles/{slug} but if not exist, we just link to # */}
                 <a href={article.slug ? `/articles/${article.slug}` : "#"} className={styles.readMoreBtn}>
-                  Read More
+                  {t('featured.read_more')}
                 </a>
               </div>
             </motion.div>

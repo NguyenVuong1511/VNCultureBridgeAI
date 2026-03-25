@@ -1,9 +1,11 @@
 import { Link } from "react-router-dom";
 import styles from './Navbar.module.css';
 import { useState, useEffect, useRef } from "react";
-import { FaBars, FaTimes } from "react-icons/fa";
+import { FaBars, FaTimes, FaGlobe } from "react-icons/fa";
+import { useTranslation } from "react-i18next";
 
 export default function Navbar() {
+  const { t, i18n } = useTranslation();
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [currentAcc, setCurrentAcc] = useState(null);
   const [isAdmin, setIsAdmin] = useState(false);
@@ -42,6 +44,11 @@ export default function Navbar() {
     if (section) section.scrollIntoView({ behavior: "smooth" });
   };
 
+  const toggleLanguage = () => {
+    const nextLang = i18n.language === 'en' ? 'vi' : 'en';
+    i18n.changeLanguage(nextLang);
+  };
+
   return (
     <nav className={styles.navbar}>
       <div className={`container ${styles.container}`}>
@@ -52,22 +59,31 @@ export default function Navbar() {
         </div>
 
         <ul className={`${styles.navItems} ${mobileMenuOpen ? styles.mobileMenuOpen : ""}`}>
-          <li><Link to="#home" onClick={(e) => { scrollToSection(e, "home"); setMobileMenuOpen(false); }} className={`${styles.link} ${styles.navItem}`}>Home</Link></li>
-          <li><Link to="#about" onClick={(e) => { scrollToSection(e, "about"); setMobileMenuOpen(false); }} className={`${styles.link} ${styles.navItem}`}>About</Link></li>
-          <li><Link to="#places" onClick={(e) => { scrollToSection(e, "places"); setMobileMenuOpen(false); }} className={`${styles.link} ${styles.navItem}`}>Discover</Link></li>
-          <li><Link to="#ai" onClick={(e) => { scrollToSection(e, "ai"); setMobileMenuOpen(false); }} className={`${styles.link} ${styles.navItem}`}>AI Explain</Link></li>
-          <li><Link to="#feedback" onClick={(e) => { scrollToSection(e, "feedback"); setMobileMenuOpen(false); }} className={`${styles.link} ${styles.navItem}`}>Feedback</Link></li>
-          <li><Link to="#contact" onClick={(e) => { scrollToSection(e, "contact"); setMobileMenuOpen(false); }} className={`${styles.link} ${styles.navItem}`}>Contact</Link></li>
+          <li><Link to="#home" onClick={(e) => { scrollToSection(e, "home"); setMobileMenuOpen(false); }} className={`${styles.link} ${styles.navItem}`}>{t('navbar.home')}</Link></li>
+          <li><Link to="#about" onClick={(e) => { scrollToSection(e, "about"); setMobileMenuOpen(false); }} className={`${styles.link} ${styles.navItem}`}>{t('navbar.about')}</Link></li>
+          <li><Link to="#places" onClick={(e) => { scrollToSection(e, "places"); setMobileMenuOpen(false); }} className={`${styles.link} ${styles.navItem}`}>{t('navbar.discover')}</Link></li>
+          <li><Link to="#ai" onClick={(e) => { scrollToSection(e, "ai"); setMobileMenuOpen(false); }} className={`${styles.link} ${styles.navItem}`}>{t('navbar.ai_assistant')}</Link></li>
+          <li><Link to="#feedback" onClick={(e) => { scrollToSection(e, "feedback"); setMobileMenuOpen(false); }} className={`${styles.link} ${styles.navItem}`}>{t('feedback.title')}</Link></li>
+          <li><Link to="#contact" onClick={(e) => { scrollToSection(e, "contact"); setMobileMenuOpen(false); }} className={`${styles.link} ${styles.navItem}`}>{t('navbar.contact')}</Link></li>
         </ul>
 
         <div className={styles.navRight}>
+          <button 
+            className={styles.langToggle} 
+            onClick={toggleLanguage}
+            title="Ngôn ngữ / Language"
+          >
+            <FaGlobe className={styles.langIcon} />
+            <span className={styles.langText}>{i18n.language === 'en' ? 'EN' : 'VI'}</span>
+          </button>
+
           {!isLoggedIn ? (
             <>
               <Link to="/signin" className={`${styles.btnLogin} ${styles.link} ${styles.btn}`}>
-                Sign in
+                {t('navbar.login')}
               </Link>
               <Link to="/signup" className={`${styles.btnRegister} ${styles.link} ${styles.btn}`}>
-                Sign up
+                {t('navbar.register')}
               </Link>
             </>
           ) : (
@@ -87,15 +103,15 @@ export default function Navbar() {
               </button>
 
               <div className={`${styles.dropdown} ${showMenu ? styles.show : ""}`}>
-                <Link to="/profile" className={styles.dropdownItem}>Hồ sơ</Link>
-                {isAdmin && <Link to="/admin" className={styles.dropdownItem}>Trang admin</Link>}
+                <Link to="/profile" className={styles.dropdownItem}>{t('navbar.profile')}</Link>
+                {isAdmin && <Link to="/admin" className={styles.dropdownItem}>{t('navbar.admin')}</Link>}
                 <hr className={styles.divider} />
-                <button onClick={handleLogout} className={styles.dropdownItem}>Đăng xuất</button>
+                <button onClick={handleLogout} className={styles.dropdownItem}>{t('navbar.logout')}</button>
               </div>
             </div>
           )}
-
-          <button
+          
+          <button 
             className={styles.mobileMenuButton}
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
             aria-label="Toggle menu"

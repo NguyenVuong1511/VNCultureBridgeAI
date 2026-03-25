@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import styles from "./CategorySection.module.css";
 import { getCategories } from "../../api/categoryApi";
+import { useTranslation } from "react-i18next";
 
 // Helper function to map category code to an icon or fallback image
 const getCategoryIcon = (code) => {
@@ -21,11 +22,12 @@ const getCategoryIcon = (code) => {
 export default function CategorySection() {
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const data = await getCategories();
+        const data = await getCategories(i18n.language);
         if (data && Array.isArray(data)) {
           setCategories(data);
         }
@@ -36,7 +38,7 @@ export default function CategorySection() {
       }
     };
     fetchCategories();
-  }, []);
+  }, [i18n.language]);
 
   if (loading) {
     return <div className={styles.loading}>Đang tải chủ đề văn hóa...</div>;
@@ -56,9 +58,9 @@ export default function CategorySection() {
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
         <div className={styles.header}>
-          <h2 className={styles.title}>Khám Phá Văn Hóa</h2>
+          <h2 className={styles.title}>{t('categories.title')}</h2>
           <p className={styles.subtitle}>
-            Tìm hiểu những nét đặc sắc trong đời sống, tín ngưỡng và nghệ thuật của người Việt thông qua các chủ đề đa dạng.
+            {t('categories.subtitle')}
           </p>
         </div>
         

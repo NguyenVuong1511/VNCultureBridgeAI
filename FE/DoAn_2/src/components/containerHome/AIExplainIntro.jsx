@@ -2,8 +2,11 @@ import React from "react";
 import { FaRobot } from "react-icons/fa";
 import styles from "./AIExplainIntro.module.css";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 export default function AIExplainIntro() {
+  const { t } = useTranslation();
+
   return (
     <section id="ai" className={styles.aiSection}>
       <motion.div
@@ -16,16 +19,9 @@ export default function AIExplainIntro() {
         <div className={styles.aiIconWrapper}>
           <FaRobot size={40} color="#fec816" />
         </div>
-        <h2 className={styles.aiTitle}>Welcome to AI Explain Web</h2>
+        <h2 className={styles.aiTitle}>{t('ai.title')}</h2>
         <p className={styles.aiText}>
-          This website is powered by <strong>Artificial Intelligence</strong> to
-          help you <strong>understand complex topics easily</strong>. Simply enter any
-          content, and our AI will provide clear, simple, and easy-to-understand
-          explanations.
-        </p>
-        <p className={styles.aiText}>
-          Save time, learn efficiently, and explore knowledge with the help of
-          AI right on this platform.
+          {t('ai.subtitle')}
         </p>
       </motion.div>
     </section>

@@ -2,43 +2,49 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import styles from "./PlaceSection.module.css";
 import { regionApi } from "../../api/regionApi";
+import { useTranslation } from "react-i18next";
 
 export default function PlaceSection() {
   const [regions, setRegions] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     const fetchRegions = async () => {
-      // The current UI uses English, but let's fetch 'en' or fallback to 'vi' gracefully
-      const res = await regionApi.getRegions('en');
-      if (res && res.success && res.data) {
-        setRegions(res.data);
+      try {
+        const data = await regionApi.getRegions(i18n.language);
+        if (data && Array.isArray(data)) {
+          setRegions(data);
+        }
+      } catch (error) {
+        console.error("Failed to load regions", error);
+      } finally {
+        setLoading(false);
       }
     };
     fetchRegions();
-  }, []);
+  }, [i18n.language]);
 
-  const getRegionName = (index, fallback) => {
-    if (regions && regions[index] && regions[index].name) {
-      return regions[index].name.toUpperCase();
-    }
-    return fallback;
+  const getRegionName = (code, fallbackName) => {
+    const region = regions.find(r => r.code === code);
+    return region ? region.name : fallbackName;
   };
 
   return (
-    <section id="places" className={styles.places}>
+    <section id="places" className={styles.mapSection}>
       <motion.div
         className={styles.container}
         initial={{ opacity: 0, y: 40 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: false }}
+        viewport={{ once: true }}
         transition={{ duration: 0.6, ease: "easeOut" }}
       >
-        <h2 className={styles.title}>Discover the Best of Vietnam</h2>
-        <p className={styles.subtitle}>
-          Vietnam is a wonderfully diverse country with many fascinating places to
-          visit — from dramatic landscapes to rich cultural traditions. These
-          highlighted experiences are a great place to start your journey.
-        </p>
+        <div className={styles.header}>
+          <h2 className={styles.title}>{t('places.title')}</h2>
+          <p className={styles.subtitle}>
+            {t('places.subtitle')}
+          </p>
+        </div>
       </motion.div>
       <div className={styles.container}>
         <img className={styles.map} src="/img/flyout-map.png" alt="" />

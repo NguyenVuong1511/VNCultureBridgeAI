@@ -2,15 +2,17 @@ import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import styles from "./EthnicGroupSection.module.css";
 import { getEthnicGroups } from "../../api/ethnicGroupApi";
+import { useTranslation } from "react-i18next";
 
 export default function EthnicGroupSection() {
   const [ethnicGroups, setEthnicGroups] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { t, i18n } = useTranslation();
 
   useEffect(() => {
     const fetchEthnicGroups = async () => {
       try {
-        const data = await getEthnicGroups();
+        const data = await getEthnicGroups(i18n.language);
         if (data && Array.isArray(data)) {
           // If too many, slice to show top ones, or show all in a horizontal scroller
           setEthnicGroups(data.slice(0, 8)); 
@@ -22,7 +24,7 @@ export default function EthnicGroupSection() {
       }
     };
     fetchEthnicGroups();
-  }, []);
+  }, [i18n.language]);
 
   if (loading) {
     return <div className={styles.loading}>Đang tải danh sách dân tộc...</div>;
@@ -53,7 +55,7 @@ export default function EthnicGroupSection() {
             viewport={{ once: true }}
             transition={{ duration: 0.5 }}
           >
-            Cộng Đồng 54 Dân Tộc
+            {t('ethnic.title')}
           </motion.h2>
           <motion.p 
             className={styles.description}
@@ -62,7 +64,7 @@ export default function EthnicGroupSection() {
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.1 }}
           >
-            Việt Nam tự hào với 54 dân tộc anh em, mỗi dân tộc mang một bản sắc văn hóa riêng biệt, từ ngôn ngữ, trang phục, phong tục tập quán đến nghệ thuật truyền thống, cùng nhau tạo nên một bức tranh văn hóa Việt Nam đa màu sắc và rực rỡ.
+            {t('ethnic.subtitle')}
           </motion.p>
           <motion.a 
             href="/dan-toc" 
@@ -72,7 +74,7 @@ export default function EthnicGroupSection() {
             viewport={{ once: true }}
             transition={{ duration: 0.5, delay: 0.2 }}
           >
-            Khám phá tất cả
+            {t('ethnic.explore_all')}
           </motion.a>
         </div>
 

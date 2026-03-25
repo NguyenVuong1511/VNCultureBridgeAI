@@ -2,6 +2,7 @@ import { useState } from "react";
 import styles from "./Contact.module.css";
 import { FaEnvelope, FaFacebookF, FaPhoneAlt, FaYoutube } from "react-icons/fa";
 import { motion } from "framer-motion";
+import { useTranslation } from "react-i18next";
 
 export default function Contact() {
   const [formData, setFormData] = useState({
@@ -9,6 +10,7 @@ export default function Contact() {
     email: "",
     message: ""
   });
+  const { t } = useTranslation();
 
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -17,7 +19,7 @@ export default function Contact() {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log("Form submitted:", formData);
-    alert("Cảm ơn bạn đã gửi phản hồi!");
+    alert(t('contact.success'));
     setFormData({ name: "", email: "", message: "" });
   };
 
@@ -31,12 +33,12 @@ export default function Contact() {
       >
         {/* Left side: Form */}
         <div className={styles.leftSide}>
-          <h2 className={styles.contactTitle}>Contact Us</h2>
+          <h2 className={styles.contactTitle}>{t('contact.title')}</h2>
           <form className={styles.contactForm} onSubmit={handleSubmit}>
             <input
               type="text"
               name="name"
-              placeholder="Full Name"
+              placeholder={t('contact.name')}
               value={formData.name}
               onChange={handleChange}
               required
@@ -45,7 +47,7 @@ export default function Contact() {
             <input
               type="email"
               name="email"
-              placeholder="Your Email"
+              placeholder={t('contact.email')}
               value={formData.email}
               onChange={handleChange}
               required
@@ -53,13 +55,13 @@ export default function Contact() {
             />
             <textarea
               name="message"
-              placeholder="Content"
+              placeholder={t('contact.message')}
               value={formData.message}
               onChange={handleChange}
               required
             />
             <button type="submit" className={styles.submitBtn}>
-              SEND
+              {t('contact.send')}
             </button>
           </form>
         </div>

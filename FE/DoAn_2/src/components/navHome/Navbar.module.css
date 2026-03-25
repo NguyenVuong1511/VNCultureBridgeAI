@@ -84,6 +84,69 @@
   border-color: #FEC816;
 }
 
+/* Thêm class này cho Desktop để 3 nút (Ngôn ngữ, Login, Register) cách đều nhau */
+.navRight {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  /* Khoảng cách giữa các nút */
+}
+
+/* ====== LANGUAGE TOGGLE - FIXED LAYOUT ====== */
+.langToggle {
+  /* Ép kiểu display flex để căn giữa icon và chữ */
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  /* Khoảng cách giữa icon và chữ */
+
+  /* Màu sắc và viền cho nút */
+  background-color: transparent;
+  border: 1px solid #d1d1d1;
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+
+  /* Giúp nút không bị co lại (quan trọng) */
+  flex-shrink: 0;
+
+  /* Cài đặt chữ */
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Hiệu ứng Hover - Đổi màu viền và chữ sang màu đỏ thương hiệu của bạn */
+.langToggle:hover {
+  background-color: #fcfcfc;
+  border-color: #C8201C;
+  color: #C8201C;
+}
+
+/* Kiểu cho Icon Quả Địa Cầu */
+.langIcon {
+  font-size: 16px;
+  color: #666;
+  /* Màu icon mặc định nhẹ nhàng */
+  transition: color 0.2s ease-in-out;
+}
+
+/* Icon cũng đổi màu đỏ khi hover vào nút */
+.langToggle:hover .langIcon {
+  color: #C8201C;
+}
+
+/* Kiểu cho chữ EN/VI (đã bỏ trong media, nên đây là kiểu mặc định) */
+.langText {
+  color: inherit;
+  /* Thừa hưởng màu từ nút cha */
+  line-height: 1;
+  /* Căn giữa hoàn hảo */
+}
+
 /* ====== USER MENU ====== */
 .userMenu {
   position: relative;
