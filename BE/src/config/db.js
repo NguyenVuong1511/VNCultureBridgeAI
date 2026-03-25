@@ -1,4 +1,5 @@
 const sql = require('mssql');
+const sqlNative = require('mssql/msnodesqlv8');
 const { env } = require('./env');
 
 let pool;
@@ -8,7 +9,8 @@ async function getPool() {
     return pool;
   }
 
-  pool = await sql.connect(env.db);
+  const driver = env.dbAuthMode === 'windows' ? sqlNative : sql;
+  pool = await driver.connect(env.db);
   return pool;
 }
 
