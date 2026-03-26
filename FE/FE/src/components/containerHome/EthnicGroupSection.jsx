@@ -66,8 +66,8 @@ export default function EthnicGroupSection() {
           >
             {t('ethnic.subtitle')}
           </motion.p>
-          <motion.a 
-            href="/dan-toc" 
+          <motion.a
+            href="#places"
             className={styles.exploreBtn}
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}

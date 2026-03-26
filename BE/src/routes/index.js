@@ -41,6 +41,7 @@ router.use('/feedback', feedbackRoutes);
 router.use('/sessions', sessionsRoutes);
 router.use('/article-views', articleViewsRoutes);
 router.use('/ai-chat', aiChatRoutes);
+router.use('/auth', authRoutes);
 router.use('/admin/auth', authRoutes);
 router.use('/admin/articles', adminArticlesRoutes);
 router.use('/admin/taxonomy', adminTaxonomyRoutes);

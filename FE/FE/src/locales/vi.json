@@ -1,0 +1,153 @@
+{
+  "navbar": {
+    "home": "Trang Chủ",
+    "discover": "Khám Phá",
+    "cultural_regions": "Vùng miền văn hoá",
+    "ethnic_groups": "54 dân tộc anh em",
+    "heritage": "Di sản văn hoá",
+    "events": "Sự kiện",
+    "news": "Tin tức",
+    "articles": "Bài viết",
+    "videos": "Video",
+    "dictionary": "Từ Điển Đa Ngôn Ngữ",
+    "ai_assistant": "Trợ Lý AI",
+    "ai_feedback": "Trợ lý AI & Phản hồi",
+    "about": "Về VCB",
+    "contact": "Liên hệ",
+    "login": "Đăng Nhập",
+    "register": "Đăng Ký",
+    "profile": "Hồ Sơ",
+    "admin": "Quản Trị",
+    "logout": "Đăng Xuất",
+    "search_placeholder": "Tìm kiếm..."
+  },
+  "hero": {
+    "title": "Chào mừng đến với VNCultureBridge",
+    "subtitle": "Khám phá vẻ đẹp sâu sắc của văn hóa Việt Nam. Từ những truyền thống lâu đời đến cuộc sống hiện đại sôi động, hãy cùng tìm hiểu một bức tranh phong phú về lịch sử, nghệ thuật và di sản kết nối nhiều thế hệ.",
+    "explore_btn": "Khám Phá Ngay"
+  },
+  "about": {
+    "title": "Vietnam Cultural Bridge",
+    "description_1": "Việt Nam, đất nước ngàn năm văn hiến, là nơi tri thức và vẻ đẹp truyền thống giao hòa. Từ những dãy núi non hùng vĩ ở phương Bắc đến vùng châu thổ màu mỡ phương Nam, mỗi tấc đất đều gắn liền với những câu chuyện lịch sử hào hùng, những phong tục tập quán độc đáo và tình người ấm áp.",
+    "description_2": "Khám phá Văn hóa Việt Nam không chỉ là hành trình tìm về cội nguồn, mà còn là cơ hội để trải nghiệm sự đa dạng của 54 dân tộc anh em. Mỗi dân tộc mang một sắc màu riêng biệt nhưng đều chung một tinh thần đoàn kết, tạo nên bức tranh văn hóa rực rỡ và đầy tự hào."
+  },
+  "featured": {
+    "title": "Bài Viết Nổi Bật",
+    "subtitle": "Khám phá sâu hơn về truyền thống, nghệ thuật và phong cách sống tạo nên nét độc đáo của văn hóa Việt Nam.",
+    "read_more": "Đọc tiếp",
+    "loading": "Đang tải nội dung nổi bật...",
+    "default_category": "Văn hóa",
+    "default_summary": "Khám phá thêm những câu chuyện và trải nghiệm đặc sắc về văn hóa Việt Nam."
+  },
+  "categories": {
+    "title": "Khám Phá Văn Hóa",
+    "subtitle": "Tìm hiểu những nét đặc sắc trong đời sống, tín ngưỡng và nghệ thuật của người Việt thông qua các chủ đề đa dạng."
+  },
+  "places": {
+    "title": "Bản Đồ Văn Hóa",
+    "subtitle": "Chạm vào từng vùng miền để khám phá những nét văn hóa đặc trưng, từ Bắc chí Nam."
+  },
+  "ethnic": {
+    "title": "Cộng Đồng 54 Dân Tộc",
+    "subtitle": "Việt Nam tự hào với 54 dân tộc anh em, mỗi dân tộc mang một bản sắc văn hóa riêng biệt, từ ngôn ngữ, trang phục, phong tục tập quán đến nghệ thuật truyền thống, cùng nhau tạo nên một bức tranh văn hóa Việt Nam đa màu sắc và rực rỡ.",
+    "explore_all": "Khám phá tất cả"
+  },
+  "ai": {
+    "title": "Khám phá Văn Hóa cùng Trợ lý AI",
+    "subtitle": "Trò chuyện, hỏi đáp và tìm hiểu sâu hơn về mọi khía cạnh của văn hóa Việt Nam với trợ lý AI thông minh của chúng tôi.",
+    "chat_now": "Trò chuyện ngay"
+  },
+  "feedback": {
+    "title": "Phản Hồi",
+    "placeholder_login": "Bạn phải đăng nhập để để lại đánh giá",
+    "placeholder": "Đánh giá của bạn",
+    "submit": "GỬI ĐÁNH GIÁ"
+  },
+  "contact": {
+    "title": "Liên Hệ",
+    "name": "Họ và tên",
+    "email": "Email của bạn",
+    "message": "Nội dung",
+    "send": "GỬI",
+    "success": "Cảm ơn bạn đã gửi phản hồi!"
+  },
+  "auth": {
+    "signin_title": "Đăng nhập",
+    "signup_title": "Tạo tài khoản",
+    "username": "Tên đăng nhập",
+    "email": "Địa chỉ email",
+    "password": "Mật khẩu",
+    "processing": "Đang xử lý...",
+    "signin_button": "Đăng nhập",
+    "signup_button": "Đăng ký",
+    "no_account": "Chưa có tài khoản?",
+    "have_account": "Đã có tài khoản?",
+    "signup_link": "Đăng ký",
+    "signin_link": "Đăng nhập",
+    "errors": {
+      "required_signin": "Vui lòng nhập tên đăng nhập và mật khẩu!",
+      "invalid_credentials": "Tên đăng nhập hoặc mật khẩu không đúng!",
+      "required_signup": "Vui lòng điền đầy đủ thông tin!",
+      "signup_failed": "Không thể tạo tài khoản!"
+    }
+  },
+  "search": {
+    "title": "Tìm kiếm",
+    "title_with_query": "Kết quả tìm kiếm cho: \"{{query}}\"",
+    "placeholder": "Tìm kiếm...",
+    "empty_prompt": "Nhập từ khóa để tìm kiếm...",
+    "no_results": "Không tìm thấy kết quả nào cho \"{{query}}\"",
+    "results_count": "Tìm thấy {{count}} kết quả",
+    "back_home": "Quay về trang chủ"
+  },
+  "footer": {
+    "desc": "Khám phá và gìn giữ văn hóa Việt Nam thông qua công nghệ AI hiện đại.",
+    "quick_links": "Liên kết nhanh",
+    "resources": "Tài nguyên",
+    "faq": "Câu hỏi thường gặp",
+    "privacy": "Chính sách bảo mật",
+    "terms": "Điều khoản & Điều kiện",
+    "support": "Trung tâm hỗ trợ",
+    "about_us": "Về chúng tôi",
+    "contact": "Liên hệ",
+    "address": "Trường Đại học Sư phạm Kỹ thuật Hưng Yên",
+    "location": "Vị trí",
+    "map_cta": "Xem trên Google Maps",
+    "bottom_credit": "Thiết kế bởi Nhóm Sinh viên Nghiên cứu Khoa học"
+  },
+  "explore": {
+    "badge": "Cẩm nang du lịch Việt Nam",
+    "title": "Khám phá Việt Nam từ Bắc vào Nam",
+    "subtitle": "Từ núi rừng Tây Bắc đến đồng bằng sông Cửu Long, khám phá những vùng đất, điểm đến và trải nghiệm nổi bật nhất trên khắp Việt Nam.",
+    "cta_regions": "Xem các vùng",
+    "cta_destinations": "Điểm đến nổi bật",
+    "quick_title": "Bắt đầu hành trình",
+    "search_cta": "Tìm kiếm điểm đến",
+    "north": "Miền Bắc",
+    "central": "Miền Trung",
+    "south": "Miền Nam",
+    "regions_title": "Khám phá theo vùng",
+    "regions_subtitle": "Mỗi miền mang một sắc thái văn hóa, cảnh quan và trải nghiệm du lịch rất riêng.",
+    "destinations_title": "Điểm đến nổi bật toàn Việt Nam",
+    "destinations_subtitle": "Những nơi được quan tâm nhiều và đại diện rõ nét cho vẻ đẹp thiên nhiên, lịch sử và đời sống địa phương.",
+    "sidebar_title": "Tìm nhanh theo cảm hứng",
+    "sidebar_subtitle": "Chọn một địa danh gợi ý để khám phá nhanh qua trang tìm kiếm.",
+    "guide_title": "Cẩm nang nổi bật",
+    "guide_subtitle": "Đọc các bài viết nổi bật để hiểu sâu hơn về lịch sử, văn hóa và đời sống Việt Nam.",
+    "guide_cta": "Xem bài nổi bật",
+    "mega_title": "Khám phá 3 miền Việt Nam",
+    "mega_subtitle": "Chọn nhanh khu vực và các điểm đến nổi bật phù hợp cho chuyến đi của bạn.",
+    "view_all": "Xem tất cả",
+    "popular_title": "Điểm đến nổi bật",
+    "region_labels": {
+      "Northern Vietnam": "Miền Bắc",
+      "Central Vietnam": "Miền Trung",
+      "Southern Vietnam": "Miền Nam"
+    },
+    "region_titles": {
+      "Northern Vietnam": "Miền Bắc Việt Nam",
+      "Central Vietnam": "Miền Trung Việt Nam",
+      "Southern Vietnam": "Miền Nam Việt Nam"
+    }
+  }
+}

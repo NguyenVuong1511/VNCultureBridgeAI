@@ -1,15 +1,97 @@
 import { useEffect, useMemo, useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
 import { FaUser, FaLock, FaEnvelope, FaArrowLeft, FaCheckCircle, FaExclamationCircle } from "react-icons/fa";
 import styles from "../components/profile/Profile.module.css";
+import { authApi } from "../api/authApi";
+
+const showTimedMessage = (setMsg, setMsgType, message, type = "error") => {
+  setMsg(message);
+  setMsgType(type);
+  setTimeout(() => setMsg(""), 3000);
+};
+
+const getProfileSuccess = (t) => t("profile.messages.profile_updated");
+const getPasswordSuccess = (t) => t("profile.messages.password_changed");
+const getExpiredSession = (t) => t("profile.messages.session_expired");
+const getSaveLabel = (t) => t("profile.save_changes");
+const getChangePasswordLabel = (t) => t("profile.change_password");
+const getBackHomeLabel = (t) => t("search.back_home");
+const getUserFallback = (t) => t("profile.user_fallback");
+
+const getValidationKeys = {
+  blankDisplayName: "profile.errors.blank_display_name",
+  longDisplayName: "profile.errors.long_display_name",
+  fileTooLarge: "profile.errors.file_too_large",
+  invalidImage: "profile.errors.invalid_image",
+  uploadSuccess: "profile.messages.avatar_uploaded",
+  fillAll: "profile.errors.fill_all",
+  shortPassword: "profile.errors.short_password",
+  longPassword: "profile.errors.long_password",
+  samePassword: "profile.errors.same_password",
+  passwordMismatch: "profile.errors.password_mismatch",
+  changePasswordFailed: "profile.errors.change_password_failed"
+};
+
+const getHelperTextKeys = {
+  emailLocked: "profile.email_locked",
+  avatarHelp: "profile.avatar_help",
+  nearLimit: "profile.username_near_limit"
+};
+
+const getTabKeys = {
+  profile: "profile.tabs.profile",
+  security: "profile.tabs.security"
+};
+
+const getFieldKeys = {
+  email: "profile.email",
+  displayName: "profile.display_name",
+  avatar: "profile.avatar",
+  currentPassword: "profile.current_password",
+  newPassword: "profile.new_password",
+  confirmPassword: "profile.confirm_password"
+};
+
+const getPlaceholderKeys = {
+  displayName: "profile.placeholders.display_name",
+  avatarUrl: "profile.placeholders.avatar_url",
+  currentPassword: "profile.placeholders.current_password",
+  newPassword: "profile.placeholders.new_password",
+  confirmPassword: "profile.placeholders.confirm_password"
+};
+
+const getMiscKeys = {
+  uploadPhoto: "profile.upload_photo",
+  or: "profile.or",
+  deleteImage: "profile.delete_image"
+};
+
+const getCharCountLabel = (t, key, count) => t(key, { count });
+
+const isPasswordWeak = (value) => value.length > 0 && value.length < 6;
+
+const shouldShowNearLimit = (value) => value.length >= 18;
+
+const getPasswordCount = (t, count) => t("profile.password_count", { count });
+const getDisplayNameCount = (t, count) => t("profile.display_name_count", { count });
+
+const getMessage = (t, key) => t(key);
+
+const getResultMessage = (result, fallback) => result?.message || fallback;
+
+const getDefaultMsgType = () => "success";
+
+const isMissingToken = (token) => !token;
+
+const noop = () => {};
+noop();
+getDefaultMsgType();
 
 export default function Profile() {
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState("profile");
-  const [users, setUsers] = useState(() => {
-    const raw = localStorage.getItem("User");
-    return raw ? JSON.parse(raw) : [];
-  });
   const [me, setMe] = useState(() => {
     const raw = localStorage.getItem("CurrentAcc");
     return raw ? JSON.parse(raw) : null;
@@ -41,26 +123,20 @@ export default function Profile() {
     if (file) {
       // Kiểm tra kích thước file (tối đa 2MB)
       if (file.size > 2 * 1024 * 1024) {
-        setMsg("Kích thước ảnh không được vượt quá 2MB!");
-        setMsgType("error");
-        setTimeout(() => setMsg(""), 3000);
+        showTimedMessage(setMsg, setMsgType, getMessage(t, getValidationKeys.fileTooLarge));
         return;
       }
       
       // Kiểm tra định dạng file
       if (!file.type.startsWith('image/')) {
-        setMsg("Vui lòng chọn file ảnh!");
-        setMsgType("error");
-        setTimeout(() => setMsg(""), 3000);
+        showTimedMessage(setMsg, setMsgType, getMessage(t, getValidationKeys.invalidImage));
         return;
       }
       
       const reader = new FileReader();
       reader.onloadend = () => {
         setAvatar(reader.result); // reader.result là base64 string
-        setMsg("Ảnh đã được tải lên thành công!");
-        setMsgType("success");
-        setTimeout(() => setMsg(""), 3000);
+        showTimedMessage(setMsg, setMsgType, getMessage(t, getValidationKeys.uploadSuccess), "success");
       };
       reader.readAsDataURL(file);
     }
@@ -80,34 +156,21 @@ export default function Profile() {
     
     // Validation: Kiểm tra username không được trống
     if (!username.trim()) {
-      setMsg("Display name cannot be left blank!");
-      setMsgType("error");
-      setTimeout(() => setMsg(""), 3000);
+      showTimedMessage(setMsg, setMsgType, getMessage(t, getValidationKeys.blankDisplayName));
       return;
     }
     
     // Validation: Kiểm tra độ dài username (tối đa 20 ký tự)
     if (username.length > 20) {
-      setMsg("Display name must not exceed 20 characters!");
-      setMsgType("error");
-      setTimeout(() => setMsg(""), 3000);
+      showTimedMessage(setMsg, setMsgType, getMessage(t, getValidationKeys.longDisplayName));
       return;
     }
     
-    const now = new Date().toISOString();
-    const updated = { 
-      ...me, 
-      username: username.trim(), 
+    const updated = {
+      ...me,
+      username: username.trim(),
       avatar: avatar || undefined,
-      updatedAt: now 
     };
-    const nextUsers = users.map((u) => 
-      u.id === me.id 
-        ? { ...u, username: username.trim(), avatar: avatar || undefined, updatedAt: now }
-        : u
-    );
-    setUsers(nextUsers);
-    localStorage.setItem("User", JSON.stringify(nextUsers));
     localStorage.setItem("CurrentAcc", JSON.stringify(updated));
     setMe(updated);
     setMsg("Profile updated successfully!");
@@ -115,68 +178,68 @@ export default function Profile() {
     setTimeout(() => setMsg(""), 3000);
   };
 
-  const changePassword = (e) => {
+  const changePassword = async (e) => {
     e.preventDefault();
     if (!me) return;
-    
-    // Validation: Kiểm tra các trường không được trống
+
     if (!oldPassword || !newPassword || !confirmPassword) {
       setMsg("Please fill in all the fields!");
       setMsgType("error");
       setTimeout(() => setMsg(""), 3000);
       return;
     }
-    
-    // Validation: Kiểm tra mật khẩu cũ đúng không
-    if (oldPassword !== me.password) {
-      setMsg("The old password is incorrect!");
-      setMsgType("error");
-      setTimeout(() => setMsg(""), 3000);
-      return;
-    }
-    
-    // Validation: Kiểm tra độ dài mật khẩu mới (tối thiểu 6, tối đa 50 ký tự)
+
     if (newPassword.length < 6) {
       setMsg("The new password must be at least 6 characters long!");
       setMsgType("error");
       setTimeout(() => setMsg(""), 3000);
       return;
     }
-    
+
     if (newPassword.length > 50) {
       setMsg("The new password must not exceed 50 characters!");
       setMsgType("error");
       setTimeout(() => setMsg(""), 3000);
       return;
     }
-    
-    // Validation: Kiểm tra mật khẩu mới khác mật khẩu cũ
+
     if (newPassword === oldPassword) {
       setMsg("The new password must be different from the old password!");
       setMsgType("error");
       setTimeout(() => setMsg(""), 3000);
       return;
     }
-    
-    // Validation: Kiểm tra xác nhận mật khẩu
+
     if (newPassword !== confirmPassword) {
       setMsg("Password confirmation does not match!");
       setMsgType("error");
       setTimeout(() => setMsg(""), 3000);
       return;
     }
-    
-    const now = new Date().toISOString();
-    const updated = { ...me, password: newPassword, updatedAt: now };
-    const nextUsers = users.map((u) => 
-      u.id === me.id ? { ...u, password: newPassword, updatedAt: now } : u
-    );
-    setUsers(nextUsers);
-    localStorage.setItem("User", JSON.stringify(nextUsers));
-    localStorage.setItem("CurrentAcc", JSON.stringify(updated));
-    setMe(updated);
-    setOldPassword(""); 
-    setNewPassword(""); 
+
+    const token = localStorage.getItem("AccessToken");
+    if (!token) {
+      setMsg("Your session has expired. Please sign in again!");
+      setMsgType("error");
+      setTimeout(() => setMsg(""), 3000);
+      navigate("/signin", { replace: true });
+      return;
+    }
+
+    const result = await authApi.changePassword(token, {
+      currentPassword: oldPassword,
+      newPassword,
+    });
+
+    if (!result?.success) {
+      setMsg(result?.message || "Unable to change password!");
+      setMsgType("error");
+      setTimeout(() => setMsg(""), 3000);
+      return;
+    }
+
+    setOldPassword("");
+    setNewPassword("");
     setConfirmPassword("");
     setMsg("Password changed successfully!");
     setMsgType("success");

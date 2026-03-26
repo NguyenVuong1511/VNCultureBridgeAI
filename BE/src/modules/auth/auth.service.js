@@ -15,12 +15,67 @@ function buildTokenPayload(user, roles, permissions) {
   };
 }
 
+function buildAuthResponse(user, roles, permissions) {
+  const payload = buildTokenPayload(user, roles, permissions);
+  const accessToken = jwt.sign(payload, env.jwtSecret, { expiresIn: env.jwtExpiresIn });
+
+  return {
+    accessToken,
+    tokenType: 'Bearer',
+    expiresIn: env.jwtExpiresIn,
+    user: payload
+  };
+}
+
+async function register({ username, email, password }) {
+  if (!username || !email || !password) {
+    throw new AppError('Tên đăng nhập, email và mật khẩu là bắt buộc', 400);
+  }
+
+  if (String(password).length < 6) {
+    throw new AppError('Mật khẩu phải có ít nhất 6 ký tự', 400);
+  }
+
+  const normalizedUsername = String(username).trim();
+  const normalizedEmail = String(email).trim().toLowerCase();
+
+  if (!normalizedUsername || !normalizedEmail) {
+    throw new AppError('Tên đăng nhập và email không hợp lệ', 400);
+  }
+
+  const [existingUserByUsername, existingUserByEmail] = await Promise.all([
+    authRepository.findUserByUsername(normalizedUsername),
+    authRepository.findUserByEmail(normalizedEmail)
+  ]);
+
+  if (existingUserByUsername) {
+    throw new AppError('Tên đăng nhập đã tồn tại', 409);
+  }
+
+  if (existingUserByEmail) {
+    throw new AppError('Email đã được sử dụng', 409);
+  }
+
+  const passwordHash = await bcrypt.hash(password, 10);
+  const user = await authRepository.createUser({
+    username: normalizedUsername,
+    email: normalizedEmail,
+    passwordHash,
+    fullName: normalizedUsername
+  });
+
+  const roles = await authRepository.findRolesByUserId(user.id);
+  const permissions = await authRepository.findPermissionsByUserId(user.id);
+
+  return buildAuthResponse(user, roles, permissions);
+}
+
 async function login({ username, password }) {
   if (!username || !password) {
     throw new AppError('Tên đăng nhập và mật khẩu là bắt buộc', 400);
   }
 
-  const user = await authRepository.findUserByUsername(username);
+  const user = await authRepository.findUserByUsername(String(username).trim());
 
   if (!user) {
     throw new AppError('Sai tên đăng nhập hoặc mật khẩu', 401);
@@ -41,17 +96,9 @@ async function login({ username, password }) {
     authRepository.findPermissionsByUserId(user.id)
   ]);
 
-  const payload = buildTokenPayload(user, roles, permissions);
-  const accessToken = jwt.sign(payload, env.jwtSecret, { expiresIn: env.jwtExpiresIn });
-
   await authRepository.updateLastLogin(user.id);
 
-  return {
-    accessToken,
-    tokenType: 'Bearer',
-    expiresIn: env.jwtExpiresIn,
-    user: payload
-  };
+  return buildAuthResponse(user, roles, permissions);
 }
 
 async function getMe(user) {
@@ -84,6 +131,7 @@ async function changePassword(userId, { currentPassword, newPassword }) {
 }
 
 module.exports = {
+  register,
   login,
   getMe,
   changePassword

@@ -11,6 +11,7 @@ import NorthernVietnamDetail from "./pages/NorthernVietnamDetail";
 import CentralVietnamDetail from "./pages/CentralVietnamDetail";
 import SouthernVietnamDetail from "./pages/SouthernVietnamDetail";
 import Search from "./pages/Search";
+import Explore from "./pages/Explore";
 import ChatBot from "./components/containerHome/ChatBot";
 // Import initRegions to make it available globally
 import "./utils/initRegions";
@@ -24,6 +25,8 @@ export default function App() {
         <Route path="/signup" element={<SignUp />} />
         <Route path="/admin" element={<Admin />} />
         <Route path="/profile" element={<Profile />} />
+        <Route path="/explore" element={<Explore />} />
+        <Route path="/kham-pha" element={<Explore />} />
         <Route path="/places-to-go/northern-vietnam" element={<NorthernVietnam />} />
         <Route path="/places-to-go/central-vietnam" element={<CentralVietnam />} />
         <Route path="/places-to-go/southern-vietnam" element={<SouthernVietnam />} />

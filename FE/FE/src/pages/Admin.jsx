@@ -30,8 +30,7 @@ export default function Admin() {
 
 	const isAdmin = useMemo(() => {
 		if (!currentUser) return false;
-		if (currentUser.role === "admin") return true;
-		return currentUser.email === "admin@vietculture.com";
+		return currentUser.role === "admin";
 	}, [currentUser]);
 
 	useEffect(() => {
@@ -42,6 +41,7 @@ export default function Admin() {
 
 	const handleSignOut = () => {
 		localStorage.removeItem("CurrentAcc");
+		localStorage.removeItem("AccessToken");
 		navigate("/", { replace: true });
 	};
 

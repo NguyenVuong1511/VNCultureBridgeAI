@@ -1,6 +1,20 @@
 const authService = require('./auth.service');
 const { successResponse } = require('../../utils/apiResponse');
 
+async function register(req, res, next) {
+  try {
+    const data = await authService.register({
+      username: req.body.username,
+      email: req.body.email,
+      password: req.body.password
+    });
+
+    res.json(successResponse({ message: 'Đăng ký thành công', data }));
+  } catch (error) {
+    next(error);
+  }
+}
+
 async function login(req, res, next) {
   try {
     const data = await authService.login({
@@ -36,6 +50,7 @@ async function changePassword(req, res, next) {
 }
 
 module.exports = {
+  register,
   login,
   getMe,
   changePassword

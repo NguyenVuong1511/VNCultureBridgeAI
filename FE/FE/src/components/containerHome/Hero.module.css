@@ -26,22 +26,37 @@
   filter: none;
 }
 
-.content h1 {
+.heroTitle {
   font-size: 5rem;
   font-weight: 700;
   margin-bottom: 1rem;
   line-height: 1.2;
-  font-family: 'Vnthfap', Helvetica, Arial, sans-serif;
   color: #F5F5F5;
   text-shadow: 2px 2px 5px #000;
 }
 
-.content p {
+.heroTitleEn {
+  font-family: 'Vnthfap', Helvetica, Arial, sans-serif;
+}
+
+.heroTitleVi {
+  font-family: 'Segoe Script', 'Lucida Handwriting', cursive;
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: 0;
+}
+
+.heroSubtitle {
   font-size: 1.5rem;
   margin-bottom: 2rem;
   opacity: 0.9;
   color: #eeeeee;
   text-shadow: 2px 2px 5px #000;
+}
+
+.heroSubtitleVi {
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Arial, sans-serif;
+  font-weight: 500;
 }
 
 .ctaBtn {

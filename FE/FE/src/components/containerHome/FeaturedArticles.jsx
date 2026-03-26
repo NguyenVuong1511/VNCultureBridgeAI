@@ -26,7 +26,7 @@ export default function FeaturedArticles() {
   }, [i18n.language]);
 
   if (loading) {
-    return <div className={styles.loading}>Loading featured content...</div>;
+    return <div className={styles.loading}>{t('featured.loading')}</div>;
   }
 
   if (!articles || articles.length === 0) {
@@ -66,10 +66,10 @@ export default function FeaturedArticles() {
                 />
               </div>
               <div className={styles.cardContent}>
-                <span className={styles.cardCategory}>{article.type || "Culture"}</span>
+                <span className={styles.cardCategory}>{article.type || t('featured.default_category')}</span>
                 <h3 className={styles.cardTitle}>{article.title}</h3>
                 <p className={styles.cardSummary}>
-                  {article.summary ? (article.summary.length > 100 ? article.summary.substring(0, 100) + "..." : article.summary) : "Discover fascinating cultural traditions."}
+                  {article.summary ? (article.summary.length > 100 ? article.summary.substring(0, 100) + "..." : article.summary) : t('featured.default_summary')}
                 </p>
                 {/* Notice link points to /articles/{slug} but if not exist, we just link to # */}
                 <a href={article.slug ? `/articles/${article.slug}` : "#"} className={styles.readMoreBtn}>

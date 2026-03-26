@@ -1,0 +1,316 @@
+.page {
+  padding-top: 80px;
+  background: #fffdf8;
+}
+
+.hero {
+  background: linear-gradient(135deg, rgba(200, 32, 28, 0.08), rgba(254, 200, 22, 0.1));
+  padding: 72px 24px 56px;
+}
+
+.heroContent {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 1.4fr 0.8fr;
+  gap: 32px;
+  align-items: stretch;
+}
+
+.heroText {
+  padding: 20px 0;
+}
+
+.badge {
+  display: inline-block;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: rgba(200, 32, 28, 0.1);
+  color: #c8201c;
+  font-weight: 700;
+  margin-bottom: 18px;
+}
+
+.heroTitle {
+  font-size: 56px;
+  line-height: 1.1;
+  margin: 0 0 18px;
+  color: #161616;
+}
+
+.heroSubtitle {
+  font-size: 18px;
+  line-height: 1.7;
+  color: #555;
+  max-width: 760px;
+}
+
+.heroActions {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-top: 28px;
+}
+
+.primaryBtn,
+.secondaryBtn,
+.guideBtn {
+  text-decoration: none;
+  border-radius: 999px;
+  padding: 14px 24px;
+  font-weight: 700;
+  transition: all 0.2s ease;
+}
+
+.primaryBtn,
+.guideBtn {
+  background: #c8201c;
+  color: #fff;
+}
+
+.primaryBtn:hover,
+.guideBtn:hover {
+  background: #a81816;
+}
+
+.secondaryBtn {
+  border: 1px solid #d9d9d9;
+  color: #222;
+  background: #fff;
+}
+
+.secondaryBtn:hover {
+  border-color: #c8201c;
+  color: #c8201c;
+}
+
+.heroPanel {
+  display: flex;
+  align-items: center;
+}
+
+.quickCard {
+  width: 100%;
+  background: #fff;
+  border-radius: 28px;
+  padding: 28px;
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.08);
+}
+
+.quickCard h3 {
+  margin: 0 0 18px;
+  font-size: 24px;
+}
+
+.quickLinks {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.quickLinks a,
+.sidebarLinks a {
+  text-decoration: none;
+  color: #222;
+  background: #fff7f0;
+  border: 1px solid #f1dfcf;
+  border-radius: 18px;
+  padding: 14px 16px;
+  font-weight: 600;
+}
+
+.quickLinks a:hover,
+.sidebarLinks a:hover {
+  color: #c8201c;
+  border-color: #c8201c;
+}
+
+.section,
+.sectionAlt {
+  max-width: 1280px;
+  margin: 0 auto;
+  padding: 56px 24px;
+}
+
+.sectionAlt {
+  padding-top: 24px;
+}
+
+.sectionHeader,
+.sectionHeaderLeft {
+  margin-bottom: 28px;
+}
+
+.sectionHeader h2,
+.sectionHeaderLeft h2 {
+  font-size: 42px;
+  margin: 0 0 10px;
+  color: #161616;
+}
+
+.sectionHeader p,
+.sectionHeaderLeft p {
+  font-size: 17px;
+  color: #666;
+  margin: 0;
+  line-height: 1.6;
+}
+
+.regionGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 24px;
+}
+
+.regionCard,
+.destinationCard {
+  text-decoration: none;
+  color: inherit;
+  background: #fff;
+  border-radius: 24px;
+  overflow: hidden;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.regionCard:hover,
+.destinationCard:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.12);
+}
+
+.regionImage,
+.destinationImage {
+  width: 100%;
+  height: 240px;
+  object-fit: cover;
+  display: block;
+}
+
+.regionBody,
+.destinationContent {
+  padding: 22px;
+}
+
+.regionLabel,
+.destinationRegion {
+  display: inline-block;
+  margin-bottom: 10px;
+  color: #c8201c;
+  font-weight: 700;
+  font-size: 13px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.regionBody h3,
+.destinationContent h3 {
+  margin: 0 0 10px;
+  font-size: 28px;
+  color: #161616;
+}
+
+.regionBody p,
+.destinationContent p {
+  color: #5d5d5d;
+  line-height: 1.7;
+  margin: 0 0 16px;
+}
+
+.regionHighlights {
+  margin: 0;
+  padding-left: 18px;
+  color: #333;
+  line-height: 1.8;
+}
+
+.portalLayout {
+  display: grid;
+  grid-template-columns: 1.6fr 0.8fr;
+  gap: 28px;
+  align-items: start;
+}
+
+.destinationGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.destinationImage {
+  height: 220px;
+}
+
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sidebarCard,
+.sidebarCardAccent {
+  border-radius: 24px;
+  padding: 24px;
+  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  background: #fff;
+}
+
+.sidebarCardAccent {
+  background: linear-gradient(180deg, #fff4e8 0%, #fff 100%);
+}
+
+.sidebarCard h3,
+.sidebarCardAccent h3 {
+  margin: 0 0 10px;
+  font-size: 24px;
+}
+
+.sidebarCard p,
+.sidebarCardAccent p {
+  margin: 0 0 16px;
+  color: #666;
+  line-height: 1.6;
+}
+
+.sidebarLinks {
+  display: grid;
+  gap: 12px;
+}
+
+@media (max-width: 1100px) {
+  .heroContent,
+  .portalLayout {
+    grid-template-columns: 1fr;
+  }
+
+  .regionGrid,
+  .destinationGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .hero {
+    padding: 48px 16px 36px;
+  }
+
+  .section,
+  .sectionAlt {
+    padding: 40px 16px;
+  }
+
+  .heroTitle {
+    font-size: 38px;
+  }
+
+  .sectionHeader h2,
+  .sectionHeaderLeft h2 {
+    font-size: 32px;
+  }
+
+  .regionGrid,
+  .destinationGrid,
+  .quickLinks {
+    grid-template-columns: 1fr;
+  }
+}

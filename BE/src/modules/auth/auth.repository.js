@@ -18,6 +18,59 @@ async function findUserByUsername(username) {
   return rows[0] || null;
 }
 
+async function findUserByEmail(email) {
+  const sql = `
+    SELECT TOP 1
+      u.IDNguoiDung AS id,
+      u.TenDangNhap AS username,
+      u.Email AS email,
+      u.MatKhauHash AS passwordHash,
+      u.HoTen AS fullName,
+      u.TrangThai AS status,
+      u.LanDangNhapCuoi AS lastLoginAt
+    FROM QUAN_TRI_NGUOI_DUNG u
+    WHERE u.Email = @email
+  `;
+
+  const rows = await query(sql, { email });
+  return rows[0] || null;
+}
+
+async function createUser({ username, email, passwordHash, fullName }) {
+  const rows = await query(`
+    INSERT INTO QUAN_TRI_NGUOI_DUNG (
+      IDNguoiDung,
+      TenDangNhap,
+      Email,
+      MatKhauHash,
+      HoTen,
+      TrangThai,
+      NgayTao,
+      NgayCapNhat
+    )
+    OUTPUT
+      INSERTED.IDNguoiDung AS id,
+      INSERTED.TenDangNhap AS username,
+      INSERTED.Email AS email,
+      INSERTED.MatKhauHash AS passwordHash,
+      INSERTED.HoTen AS fullName,
+      INSERTED.TrangThai AS status,
+      INSERTED.LanDangNhapCuoi AS lastLoginAt
+    VALUES (
+      NEWID(),
+      @username,
+      @email,
+      @passwordHash,
+      @fullName,
+      'HOAT_DONG',
+      SYSUTCDATETIME(),
+      SYSUTCDATETIME()
+    )
+  `, { username, email, passwordHash, fullName });
+
+  return rows[0] || null;
+}
+
 async function findRolesByUserId(userId) {
   const sql = `
     SELECT
@@ -86,6 +139,8 @@ async function findUserById(userId) {
 
 module.exports = {
   findUserByUsername,
+  findUserByEmail,
+  createUser,
   findUserById,
   findRolesByUserId,
   findPermissionsByUserId,

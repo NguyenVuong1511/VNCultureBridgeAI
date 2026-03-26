@@ -1,0 +1,153 @@
+{
+  "navbar": {
+    "home": "Home",
+    "discover": "Discover",
+    "cultural_regions": "Cultural Regions",
+    "ethnic_groups": "54 Ethnic Groups",
+    "heritage": "Cultural Heritage",
+    "events": "Events",
+    "news": "News",
+    "articles": "Articles",
+    "videos": "Videos",
+    "dictionary": "Multilingual Dictionary",
+    "ai_assistant": "AI Assistant",
+    "ai_feedback": "AI Assistant & Feedback",
+    "about": "About VCB",
+    "contact": "Contact",
+    "login": "Login",
+    "register": "Register",
+    "profile": "Profile",
+    "admin": "Admin",
+    "logout": "Logout",
+    "search_placeholder": "Search..."
+  },
+  "hero": {
+    "title": "Welcome to VNCultureBridge",
+    "subtitle": "Discover the profound beauty of Vietnamese culture. From ancient traditions to vibrant modern life, explore a rich tapestry of history, art, and heritage that connects generations.",
+    "explore_btn": "Explore Now"
+  },
+  "about": {
+    "title": "Vietnam Cultural Bridge",
+    "description_1": "Vietnam, a nation with thousands of years of civilization, is a place where knowledge and traditional beauty seamlessly blend. From majestic northern mountains to the fertile southern deltas, every inch of land is tied to heroic historical tales, unique customs, and warm hospitality.",
+    "description_2": "Exploring Vietnamese Culture is not just a journey back to its roots, but also an opportunity to experience the diversity of 54 ethnic groups. Each group carries a distinct color yet shares a spirit of unity, forging a vibrant and proud cultural tapestry."
+  },
+  "featured": {
+    "title": "Featured Cultural Articles",
+    "subtitle": "Dive deeper into the traditions, arts, and lifestyle that make Vietnamese culture so exceptionally unique.",
+    "read_more": "Read More",
+    "loading": "Loading featured content...",
+    "default_category": "Culture",
+    "default_summary": "Discover more stories and travel experiences that reflect the richness of Vietnam."
+  },
+  "categories": {
+    "title": "Explore Culture",
+    "subtitle": "Learn about the distinctive aspects of Vietnamese life, beliefs, and arts through diverse topics."
+  },
+  "places": {
+    "title": "Cultural Map",
+    "subtitle": "Touch each region to discover its characteristic cultural features, from North to South."
+  },
+  "ethnic": {
+    "title": "54 Ethnic Communities",
+    "subtitle": "Vietnam proudly hosts 54 ethnic brotherly groups, each carrying a unique cultural identity, from language, clothing, customs to traditional arts, together forming a colorful and brilliant Vietnamese cultural landscape.",
+    "explore_all": "Explore All"
+  },
+  "ai": {
+    "title": "Explore Culture with AI Assistant",
+    "subtitle": "Chat, ask questions, and dive deeper into all aspects of Vietnamese culture with our smart AI assistant.",
+    "chat_now": "Chat Now"
+  },
+  "feedback": {
+    "title": "Feedback",
+    "placeholder_login": "You must log in to leave a review",
+    "placeholder": "Your feedback",
+    "submit": "SUBMIT"
+  },
+  "contact": {
+    "title": "Contact Us",
+    "name": "Full Name",
+    "email": "Your Email",
+    "message": "Content",
+    "send": "SEND",
+    "success": "Thank you for your feedback!"
+  },
+  "auth": {
+    "signin_title": "Sign In",
+    "signup_title": "Create Account",
+    "username": "Username",
+    "email": "Email address",
+    "password": "Password",
+    "processing": "Processing...",
+    "signin_button": "Sign In",
+    "signup_button": "Sign Up",
+    "no_account": "Don’t have an account?",
+    "have_account": "Already have an account?",
+    "signup_link": "Sign up",
+    "signin_link": "Sign in",
+    "errors": {
+      "required_signin": "Username and password are required!",
+      "invalid_credentials": "Username or password is incorrect!",
+      "required_signup": "Please fill in all fields!",
+      "signup_failed": "Unable to create account!"
+    }
+  },
+  "search": {
+    "title": "Search",
+    "title_with_query": "Search results for: \"{{query}}\"",
+    "placeholder": "Search...",
+    "empty_prompt": "Enter a keyword to search...",
+    "no_results": "No results found for \"{{query}}\"",
+    "results_count": "Found {{count}} results",
+    "back_home": "Back to Home"
+  },
+  "footer": {
+    "desc": "Discover and preserve Vietnamese culture through modern AI technology.",
+    "quick_links": "Quick Links",
+    "resources": "Resources",
+    "faq": "FAQ",
+    "privacy": "Privacy Policy",
+    "terms": "Terms & Conditions",
+    "support": "Support Center",
+    "about_us": "About Us",
+    "contact": "Contact",
+    "address": "Hung Yen University of Technology and Education",
+    "location": "Location",
+    "map_cta": "View on Google Maps",
+    "bottom_credit": "Designed by the Scientific Research Student Group"
+  },
+  "explore": {
+    "badge": "Vietnam travel portal",
+    "title": "Discover Vietnam from North to South",
+    "subtitle": "From the mountains of the Northwest to the Mekong Delta, explore Vietnam’s most remarkable regions, destinations, and travel experiences.",
+    "cta_regions": "Explore regions",
+    "cta_destinations": "Featured destinations",
+    "quick_title": "Start your journey",
+    "search_cta": "Search destinations",
+    "north": "Northern Vietnam",
+    "central": "Central Vietnam",
+    "south": "Southern Vietnam",
+    "regions_title": "Discover by region",
+    "regions_subtitle": "Each region offers its own culture, landscapes, local flavors, and travel rhythm.",
+    "destinations_title": "Featured destinations across Vietnam",
+    "destinations_subtitle": "Places that best represent Vietnam’s nature, history, and local life.",
+    "sidebar_title": "Browse by inspiration",
+    "sidebar_subtitle": "Choose a suggested place and jump directly into search results.",
+    "guide_title": "Featured guides",
+    "guide_subtitle": "Read editorial highlights to better understand Vietnamese history, culture, and everyday life.",
+    "guide_cta": "Read featured articles",
+    "mega_title": "Discover Vietnam’s three regions",
+    "mega_subtitle": "Quickly choose a region and browse highlighted destinations for your next trip.",
+    "view_all": "View all",
+    "popular_title": "Popular destinations",
+    "region_labels": {
+      "Northern Vietnam": "North",
+      "Central Vietnam": "Central",
+      "Southern Vietnam": "South"
+    },
+    "region_titles": {
+      "Northern Vietnam": "Northern Vietnam",
+      "Central Vietnam": "Central Vietnam",
+      "Southern Vietnam": "Southern Vietnam"
+    }
+  }
+}
